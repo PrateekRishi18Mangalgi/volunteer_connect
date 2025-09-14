@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+{% load static %}
+{% load event_filters %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard | Volunteer Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #2e59a9;
+            --accent-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --warning-color: #f6c23e;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .dashboard-header {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .event-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .event-card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .event-card-body {
+            padding: 1.5rem;
+        }
+        
+        .event-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .event-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .event-meta-item i {
+            width: 20px;
+            color: var(--primary-color);
+        }
+        
+        .event-stats {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 0 1rem;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.5rem 1.25rem;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            padding: 0.5rem 1.25rem;
+        }
+        
+        .btn-info {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #19b37b;
+            border-color: #19b37b;
+            color: white;
+        }
+        
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        
+        .create-event-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .dashboard-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-actions {
+                flex-direction: column;
+            }
+            
+            .dashboard-actions .btn {
+                width: 100%;
+            }
+        }
+
+        .participants-section {
+            margin-top: 1.5rem;
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .participants-section .btn {
+            position: relative;
+            text-align: left;
+            padding: 0.75rem 1rem;
+        }
+
+        .participants-section .btn i.fa-chevron-down {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .participants-section .btn[aria-expanded="true"] i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .participants-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .participants-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .participants-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .participants-list::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+
+        .participant-card {
+            background-color: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 0.5rem;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .participant-card:hover {
+            transform: translateX(5px);
+        }
+
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .participant-info img {
+            border: 2px solid var(--primary-color);
+        }
+
+        .participant-info h6 {
+            color: var(--primary-color);
+        }
+
+        .participant-info small {
+            display: block;
+            font-size: 0.8rem;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark-mode .dashboard-header,
+        .dark-mode .event-card,
+        .dark-mode .empty-state {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .dark-mode .event-meta,
+        .dark-mode .event-stats,
+        .dark-mode .participants-section {
+            background-color: #363636;
+            color: #ffffff;
+        }
+
+        .dark-mode .participant-card {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .dark-mode .text-muted {
+            color: #a0a0a0 !important;
+        }
+
+        .dark-mode .feedback-item {
+            background-color: #363636 !important;
+            border-color: #4a4a4a;
+        }
+
+        .dark-mode .feedback-item p {
+            color: #ffffff;
+        }
+
+        .dark-mode .feedback-item small {
+            color: #a0a0a0 !important;
+        }
+
+        .dark-mode .participants-section .btn-secondary {
+            background-color: #4a4a4a;
+            border-color: #4a4a4a;
+            color: #ffffff;
+        }
+
+        .dark-mode .participants-section .collapse {
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .dark-mode .stars .fa-star.text-muted {
+            color: #4a4a4a !important;
+        }
+
+        .dark-mode .stars .fa-star.text-warning {
+            color: #ffc107 !important;
+        }
+
+        /* Theme toggle button styles */
+        .theme-toggle {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            margin-left: 1rem;
+            cursor: pointer;
+            color: inherit;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .theme-toggle:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .event-feedback-section {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-feedback-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .stars {
+            display: inline-block;
+        }
+
+        .stars .fa-star {
+            font-size: 0.9rem;
+        }
+
+        .feedback-item {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+        .feedback-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .rating-summary {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .feedback-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="dashboard-header animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i> Manager Dashboard
+                </h1>
+                <div class="d-flex align-items-center">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4e73df&color=fff" 
+                         alt="Profile" 
+                         class="rounded-circle me-2" 
+                         width="40" 
+                         height="40">
+                    <span>{{ user.username }}</span>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {% if upcoming_events or past_events %}
+            <div class="row animate__animated animate__fadeIn">
+                <!-- Upcoming Events Section -->
+                {% if upcoming_events %}
+                    <h2 class="h4 mb-4 animate__animated animate__fadeIn">
+                        <i class="fas fa-calendar-alt me-2"></i> Upcoming Events
+                    </h2>
+                    {% for event in upcoming_events %}
+                        <div class="col-lg-6">
+                            <div class="event-card">
+                                <div class="event-card-header">
+                                    <h3 class="h5 mb-0">{{ event.name }}</h3>
+                                    <span class="badge bg-primary text-white">
+                                        Upcoming
+                                    </span>
+                                </div>
+                                <div class="event-card-body">
+                                    {% if event.image %}
+                                        <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid mb-3 rounded" style="width: 100%; height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center mb-3 rounded" style="height: 200px;">
+                                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    {% endif %}
+
+                                    <p class="mb-3">{{ event.description }}</p>
+                                    
+                                    <div class="event-meta">
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-calendar-day"></i>
+                                            <span>Date: {{ event.date }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>Time: {{ event.time }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-tag"></i>
+                                            <span>Type: {{ event.type }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>Address: {{ event.address }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-map-pin"></i>
+                                            <span>Pincode: {{ event.pincode }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="event-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-number">{{ event.participants.count }}</div>
+                                            <div class="stat-label">Participants</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-number">{{ event.participation_requests.count }}</div>
+                                            <div class="stat-label">Pending Requests</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <a href="{% url 'edit_event' event.id %}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <a href="{% url 'manage_requests' event.id %}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-users me-1"></i> Manage Requests
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Past Events Section -->
+                {% if past_events %}
+                    <h2 class="h4 mb-4 mt-5 animate__animated animate__fadeIn">
+                        <i class="fas fa-history me-2"></i> Past Events
+                    </h2>
+                    {% for event in past_events %}
+                        <div class="col-lg-6">
+                            <div class="event-card past-event">
+                                <div class="event-card-header bg-secondary">
+                                    <h3 class="h5 mb-0">{{ event.name }}</h3>
+                                    <span class="badge bg-secondary text-white">
+                                        Past Event
+                                    </span>
+                                </div>
+                                <div class="event-card-body">
+                                    {% if event.image %}
+                                        <img src="{{ event.image.url }}" alt="{{ event.name }}" class="img-fluid mb-3 rounded" style="width: 100%; height: 200px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light d-flex align-items-center justify-content-center mb-3 rounded" style="height: 200px;">
+                                            <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    {% endif %}
+
+                                    <p class="mb-3">{{ event.description }}</p>
+                                    
+                                    <div class="event-meta">
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-calendar-day"></i>
+                                            <span>Date: {{ event.date }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-clock"></i>
+                                            <span>Time: {{ event.time }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-tag"></i>
+                                            <span>Type: {{ event.type }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>Address: {{ event.address }}</span>
+                                        </div>
+                                        <div class="event-meta-item">
+                                            <i class="fas fa-map-pin"></i>
+                                            <span>Pincode: {{ event.pincode }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Participants Collapsible Section -->
+                                    <div class="participants-section mt-4">
+                                        <button class="btn btn-secondary w-100 d-flex justify-content-between align-items-center" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#participants-{{ event.id }}" 
+                                                aria-expanded="false">
+                                            <span>
+                                                <i class="fas fa-users me-2"></i>
+                                                View Participants ({{ event.participants.count }})
+                                            </span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        
+                                        <div class="collapse mt-3" id="participants-{{ event.id }}">
+                                            {% if event.participants.exists %}
+                                                <div class="participants-list">
+                                                    {% for participant in event.participants.all %}
+                                                        <div class="participant-card">
+                                                            <div class="participant-info">
+                                                                <img src="https://ui-avatars.com/api/?name={{ participant.username }}&background=4e73df&color=fff" 
+                                                                     alt="{{ participant.username }}" 
+                                                                     class="rounded-circle" 
+                                                                     width="40" 
+                                                                     height="40">
+                                                                <div>
+                                                                    <h6 class="mb-0">{{ participant.username }}</h6>
+                                                                    {% if participant.volunteerprofile %}
+                                                                        <small class="text-muted">
+                                                                            {{ participant.volunteerprofile.profession }} | 
+                                                                            Age: {{ participant.volunteerprofile.age }} |
+                                                                            Phone: {{ participant.volunteerprofile.phone_number }}
+                                                                        </small>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center text-muted py-3">
+                                                    <i class="fas fa-user-times mb-2"></i>
+                                                    <p class="mb-0">No participants for this event</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Feedback Collapsible Section -->
+                                    <div class="participants-section mt-4">
+                                        <button class="btn btn-secondary w-100 d-flex justify-content-between align-items-center" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#feedback-{{ event.id }}" 
+                                                aria-expanded="false">
+                                            <span>
+                                                <i class="fas fa-comments me-2"></i>
+                                                View Feedback ({{ event.event_feedbacks.count }})
+                                                {% if event.event_feedbacks.exists %}
+                                                    <small class="ms-2">
+                                                        {{ event|avg_rating|floatformat:1 }}/5
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    </small>
+                                                {% endif %}
+                                            </span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        
+                                        <div class="collapse mt-3" id="feedback-{{ event.id }}">
+                                            {% if event.event_feedbacks.exists %}
+                                                <div class="feedback-list">
+                                                    {% for feedback in event.event_feedbacks.all %}
+                                                        <div class="feedback-item p-3 bg-light rounded mb-2">
+                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                <div class="w-100">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <div class="stars">
+                                                                            {% for i in "12345"|make_list %}
+                                                                                <i class="fas fa-star {% if forloop.counter <= feedback.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                                                            {% endfor %}
+                                                                        </div>
+                                                                        <small class="text-muted">{{ feedback.created_at|date:"M d, Y" }}</small>
+                                                                    </div>
+                                                                    <p class="mb-1">{{ feedback.comment }}</p>
+                                                                    <small class="text-muted">
+                                                                        By {{ feedback.volunteer.username }}
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center text-muted py-3">
+                                                    <i class="fas fa-comment-slash mb-2"></i>
+                                                    <p class="mb-0">No feedback received yet</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="event-stats mt-4">
+                                        <div class="stat-item">
+                                            <div class="stat-number">{{ event.participants.count }}</div>
+                                            <div class="stat-label">Total Participants</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-number">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            </div>
+                                            <div class="stat-label">Completed</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="empty-state animate__animated animate__fadeIn">
+                <i class="fas fa-calendar-times"></i>
+                <h3 class="h4 mb-3">No Events Created Yet</h3>
+                <p class="text-muted mb-4">You haven't created any events. Get started by creating your first event!</p>
+                <a href="/event/create/" class="btn btn-primary create-event-btn">
+                    <i class="fas fa-plus-circle"></i> Create Your First Event
+                </a>
+            </div>
+        {% endif %}
+
+        <div class="dashboard-actions animate__animated animate__fadeIn">
+            <a href="/event/create/" class="btn btn-primary create-event-btn">
+                <i class="fas fa-plus-circle"></i> Create New Event
+            </a>
+            <a href="/logout/" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+
+        <!-- Add this section where you want to display feedback -->
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add animation to cards as they come into view
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.animate__animated');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            elements.forEach(element => {
+                element.style.opacity = 0;
+                observer.observe(element);
+            });
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                } else {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

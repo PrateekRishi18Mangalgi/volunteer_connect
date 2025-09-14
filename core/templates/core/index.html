@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Connect - Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.2.0/dist/index.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #7C4DFF;
+            --secondary-color: #6B42E8;
+            --accent-color: #22C55E;
+            --bg-gradient: linear-gradient(135deg, #7C4DFF 0%, #6B42E8 100%);
+            --text-color: #1A1A1A;
+            --light-text: #FFFFFF;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #FFFFFF;
+            color: var(--text-color);
+        }
+        /* Modern Navbar */
+        .navbar {
+            background: #FFFFFF !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-color) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--bg-gradient);
+            padding: 120px 0 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 150px;
+            background: #FFFFFF;
+            clip-path: polygon(0 40%, 100% 0, 100% 100%, 0% 100%);
+        }
+            border-radius: 30px;
+            box-shadow: 0 4px 16px rgba(33,150,243,0.12);
+        }
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(33,150,243,0.18);
+        }
+        .btn-secondary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-radius: 30px;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(67,233,123,0.10);
+        }
+        .btn-secondary:hover {
+            background-color: var(--accent-color-dark);
+            border-color: var(--accent-color-dark);
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 8px 24px rgba(67,233,123,0.18);
+        }
+        .feature-card {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 6px 24px rgba(33,150,243,0.08), 0 1.5px 6px rgba(67,233,123,0.06);
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            position: relative;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 16px 32px rgba(33,150,243,0.16), 0 4px 16px rgba(67,233,123,0.12);
+        }
+        /* SVG pattern overlay for features section */
+        .py-5.bg-light {
+            position: relative;
+            z-index: 1;
+        }
+        .py-5.bg-light::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            opacity: 0.10;
+            background: url('data:image/svg+xml;utf8,<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="60" height="60" rx="15" fill="none" stroke="%232196f3" stroke-width="1.5"/><circle cx="40" cy="40" r="25" stroke="%2343e97b" stroke-width="1.5" fill="none"/></svg>');
+            background-size: 160px 160px;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #2196f3 60%, #43e97b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 2px 8px rgba(33,150,243,0.10);
+        }
+        .testimonial-card {
+            border-left: 4px solid var(--primary-color);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.97);
+            box-shadow: 0 4px 16px rgba(33,150,243,0.08);
+        }
+        /* Animation classes */
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        /* Chatbot styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 80%;
+            max-width: 1200px;
+            height: 400px;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(33,150,243,0.18);
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            display: none;
+            flex-direction: row;
+        }
+        .chatbot-header {
+            width: 250px;
+            background: linear-gradient(135deg, #2196f3 60%, #43e97b 100%);
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .chatbot-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-left: 1px solid #eee;
+        }
+        .chatbot-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 18px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        .bot-message {
+            background-color: #f1f1f1;
+            border-bottom-left-radius: 5px;
+            margin-right: auto;
+        }
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+            margin-left: auto;
+        }
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .chatbot-input input {
+            flex-grow: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        .chatbot-input button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .typing-indicator {
+            display: flex;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 18px;
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            width: fit-content;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #777;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        .chatbot-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2196f3 60%, #43e97b 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(33,150,243,0.18);
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+        .chatbot-icon i {
+            font-size: 24px;
+        }
+        .chatbot-icon:hover {
+            transform: scale(1.1);
+        }
+        #chatbotCloseIcon {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            cursor: pointer;
+        }
+        /* Footer update */
+        footer.bg-dark {
+            background: linear-gradient(135deg, #1769aa 60%, #38b86c 100%) !important;
+        }
+        .social-icons a {
+            transition: color 0.2s, transform 0.2s;
+        }
+        .social-icons a:hover {
+            color: var(--accent-color);
+            transform: scale(1.2);
+        }
+        /* Dropdown styles */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 8px 16px;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .dropdown-divider {
+            margin: 4px 0;
+        }
+
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-hands-helping me-2"></i>
+                Volunteer Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                    <!-- Replace the existing login nav-item with this dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end animate__animated animate__fadeIn" aria-labelledby="loginDropdown">
+                            <li>
+                                <a class="dropdown-item" href="/volunteer/login/">
+                                    <i class="fas fa-user me-2"></i> Volunteer Login
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/manager/login/">
+                                    <i class="fas fa-user-tie me-2"></i> Event Manager Login
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4 animate__animated animate__fadeInDown">Volunteer Management System</h1>
+                    <p class="lead mb-5 animate__animated animate__fadeIn animate__delay-1s">Connecting passionate volunteers with meaningful opportunities to make a difference in communities worldwide.</p>
+                    <div class="d-flex justify-content-center justify-content-lg-start gap-3 animate__animated animate__fadeIn animate__delay-2s">
+                        <a href="/volunteer/signup/" class="btn btn-primary btn-lg pulse">Become a Volunteer</a>
+                        <a href="/manager/signup/" class="btn btn-secondary btn-lg">Manage Events</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block animate__animated animate__fadeIn animate__delay-1s">
+                    <img src="https://images.unsplash.com/photo-1549923746-c502d488b3ea?q=80&w=2071&auto=format&fit=crop" alt="Volunteers" class="img-fluid rounded float" style="max-height: 400px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Why Choose Volunteer Connect?</h2>
+                <p class="text-muted">We make volunteering and event management simple and effective</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card card p-4 animate__animated animate__fadeInUp">
+                        <div class="text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-search-location"></i>
+                            </div>
+                            <h4>Discover Opportunities</h4>
+                            <p class="text-muted">Find volunteer work that matches your skills, interests, and schedule.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card card p-4 animate__animated animate__fadeInUp animate__delay-1s">
+                        <div class="text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h4>Manage Volunteers</h4>
+                            <p class="text-muted">Easily organize, communicate with, and track your volunteer workforce.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card card p-4 animate__animated animate__fadeInUp animate__delay-2s">
+                        <div class="text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4>Track Impact</h4>
+                            <p class="text-muted">Measure and showcase the difference your volunteers are making.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   
+    
+    <!-- Testimonials -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">What People Say</h2>
+                <p class="text-muted">Hear from our volunteers and event organizers</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card testimonial-card p-4 h-100 animate__animated animate__fadeInLeft">
+                        <div class="d-flex mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" class="rounded-circle me-3" width="60" alt="User">
+                            <div>
+                                <h5 class="mb-0">Sarah Johnson</h5>
+                                <p class="text-muted mb-0">Volunteer</p>
+                            </div>
+                        </div>
+                        <p>"Volunteer Connect made it so easy to find opportunities that fit my schedule. I've met amazing people and made a real difference in my community."</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card testimonial-card p-4 h-100 animate__animated animate__fadeInUp">
+                        <div class="d-flex mb-3">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" class="rounded-circle me-3" width="60" alt="User">
+                            <div>
+                                <h5 class="mb-0">Michael Chen</h5>
+                                <p class="text-muted mb-0">Event Manager</p>
+                            </div>
+                        </div>
+                        <p>"As a nonprofit organizer, this platform has transformed how we recruit and manage volunteers. The tools are intuitive and the volunteers are engaged."</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card testimonial-card p-4 h-100 animate__animated animate__fadeInRight">
+                        <div class="d-flex mb-3">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle me-3" width="60" alt="User">
+                            <div>
+                                <h5 class="mb-0">Emma Rodriguez</h5>
+                                <p class="text-muted mb-0">Community Leader</p>
+                            </div>
+                        </div>
+                        <p>"The reporting features help us demonstrate our impact to funders. We've doubled our volunteer base since joining Volunteer Connect."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-light">
+        <div class="container text-center">
+            <h2 class="fw-bold mb-4">Ready to Make a Difference?</h2>
+            <p class="lead mb-5">Join thousands of volunteers and organizations creating positive change around the world.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="/volunteer/signup/" class="btn btn-primary btn-lg">Sign Up as Volunteer</a>
+                <a href="/manager/signup/" class="btn btn-secondary btn-lg">Register Your Organization</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Volunteer Connect</h5>
+                    <p>Connecting passion with purpose through volunteerism.</p>
+                    <div class="social-icons">
+                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Home</a></li>
+                        <li><a href="#" class="text-white">About</a></li>
+                        <li><a href="#" class="text-white">Events</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Volunteer Handbook</a></li>
+                        <li><a href="#" class="text-white">Event Guidelines</a></li>
+                        <li><a href="#" class="text-white">Success Stories</a></li>
+                        <li><a href="#" class="text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 123 Volunteer St, Help City</li>
+                        <li><i class="fas fa-phone me-2"></i> (123) 456-7890</li>
+                        <li><i class="fas fa-envelope me-2"></i> info@volunteerconnect.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Volunteer Connect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Icon -->
+    <div class="chatbot-icon" id="chatbotIconButton">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer" style="display: none;">
+        <div class="chatbot-header">
+            <div>
+                <i class="fas fa-robot me-2"></i>
+                <span>Volunteer Connect AI Assistant</span>
+            </div>
+        </div>
+        <div class="chatbot-body" id="chatbotBody">
+            <i class="fas fa-times" id="chatbotCloseIcon"></i>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot-message">
+                    Hello! I'm your Volunteer Connect assistant, powered by Gemini AI. How can I help you today?
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="userInput" placeholder="Ask me about volunteering..." autocomplete="off">
+                <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate stats counters
+            const counters = document.querySelectorAll('.stats-counter');
+            const speed = 200;
+            
+            counters.forEach(counter => {
+                const target = +counter.innerText.replace('+', '');
+                const count = +counter.innerText.replace('+', '') / 2;
+                const inc = target / speed;
+                
+                const updateCount = () => {
+                    const current = +counter.innerText.replace('+', '');
+                    
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + inc) + '+';
+                        setTimeout(updateCount, 1);
+                    } else {
+                        counter.innerText = target + '+';
+                    }
+                };
+                
+                // Start counting when element is in view
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        counter.innerText = '0+';
+                        updateCount();
+                        observer.unobserve(counter);
+                    }
+                });
+                
+                observer.observe(counter);
+            });
+            
+            // Chatbot functionality
+            const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // Replace with your actual API key
+        
+            // Initialize Gemini AI
+            const initGeminiAI = () => {
+                // Import the generative AI library
+                const { GoogleGenerativeAI } = window.google.generativeai;
+                
+                // Initialize the Gemini API with your API key
+                const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+                
+                // Get the model (Gemini Pro)
+                const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+                
+                // System prompt with volunteer connect specific data and instructions
+                const systemPrompt = `
+                You are the AI assistant for Volunteer Connect, a platform that connects volunteers with meaningful opportunities.
+                
+                Key information about Volunteer Connect:
+                - We help volunteers find opportunities based on their skills, interests, and schedule
+                - Organizations can manage volunteers, track hours, and measure impact
+                - We support volunteer work in Education, Environment, Health, Community, and Animal sectors
+                - We have 12,345+ volunteers registered, 2,500+ events hosted, 350+ organizations, and operate in 50+ countries
+                
+                Features for volunteers:
+                - Profile creation with skills and interests
+                - Search for opportunities by location, cause, time commitment
+                - Track volunteer hours and impact
+                - Connect with other volunteers
+                
+                Features for organizations:
+                - Create and manage events
+                - Schedule and communicate with volunteers
+                - Generate impact reports
+                - Recruit volunteers based on skills
+                
+                Be helpful, friendly, and concise. Always provide accurate information about Volunteer Connect.
+                If you don't know something specific about our platform, be honest and offer to connect the user with our team.
+                `;
+                
+                return { model, systemPrompt };
+            };
+            
+            // Handle Gemini AI chat functionality
+            const initChatbot = async () => {
+                const { model, systemPrompt } = initGeminiAI();
+                
+                const chatHistory = [{
+                    role: "model",
+                    parts: [{ text: "Hello! I'm your Volunteer Connect assistant, powered by Gemini AI. How can I help you today?" }]
+                }];
+                
+                const chatbotIconButton = document.getElementById('chatbotIconButton');
+                const chatbotContainer = document.getElementById('chatbotContainer');
+                const chatbotToggle = document.getElementById('chatbotToggle');
+                const chatbotCloseIcon = document.getElementById('chatbotCloseIcon');
+                const chatbotBody = document.getElementById('chatbotBody');
+                const chatbotMessages = document.getElementById('chatbotMessages');
+                const userInput = document.getElementById('userInput');
+                const sendMessage = document.getElementById('sendMessage');
+                
+                let isChatbotOpen = false;
+                
+                // Toggle chatbot visibility
+                chatbotIconButton.addEventListener('click', () => {
+                    isChatbotOpen = !isChatbotOpen;
+                    if (isChatbotOpen) {
+                        chatbotContainer.style.display = 'flex';
+                        chatbotIconButton.style.display = 'none';
+                    } else {
+                        chatbotContainer.style.display = 'none';
+                        chatbotIconButton.style.display = 'flex';
+                    }
+                });
+                
+                // Close chatbot
+                chatbotCloseIcon.addEventListener('click', () => {
+                    chatbotContainer.style.display = 'none';
+                    chatbotIconButton.style.display = 'flex';
+                    isChatbotOpen = false;
+                });
+                
+                // Add message to chat
+                const addMessage = (text, isUser) => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                    messageDiv.textContent = text;
+                    chatbotMessages.appendChild(messageDiv);
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                    
+                    // Update chat history
+                    chatHistory.push({
+                        role: isUser ? "user" : "model",
+                        parts: [{ text: text }]
+                    });
+                };
+                
+                // Show typing indicator
+                const showTypingIndicator = () => {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'typing-indicator';
+                    indicator.id = 'typingIndicator';
+                    indicator.innerHTML = '<span></span><span></span><span></span>';
+                    chatbotMessages.appendChild(indicator);
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                };
+                
+                // Remove typing indicator
+                const removeTypingIndicator = () => {
+                    const indicator = document.getElementById('typingIndicator');
+                    if (indicator) {
+                        indicator.remove();
+                    }
+                };
+                
+                // Generate AI response
+                const generateResponse = async (userMessage) => {
+                    try {
+                        showTypingIndicator();
+                        
+                        // Create a chat session with the system prompt
+                        const chat = model.startChat({
+                            history: chatHistory,
+                            generationConfig: {
+                                maxOutputTokens: 500,
+                                temperature: 0.7
+                            }
+                        });
+                        
+                        // Send the user's message to the model
+                        const result = await chat.sendMessage(userMessage);
+                        const response = result.response.text();
+                        
+                        removeTypingIndicator();
+                        addMessage(response, false);
+                    } catch (error) {
+                        console.error('Error generating AI response:', error);
+                        removeTypingIndicator();
+                        addMessage("I'm sorry, I'm having trouble connecting to my knowledge base. Please try again later or contact our support team for assistance.", false);
+                    }
+                };
+                
+                // Handle user message submission
+                const handleUserMessage = () => {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        addMessage(message, true);
+                        userInput.value = '';
+                        generateResponse(message);
+                    }
+                };
+                
+                // Event listeners
+                sendMessage.addEventListener('click', handleUserMessage);
+                userInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleUserMessage();
+                    }
+                });
+            };
+            
+            // Initialize the chatbot
+            initChatbot();
+
+            // Chatbot UI Elements
+            const chatbotIconButton = document.getElementById('chatbotIconButton');
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            const chatbotBody = document.getElementById('chatbotBody');
+            const chatbotCloseIcon = document.getElementById('chatbotCloseIcon');
+
+            // Show chatbot when icon is clicked
+            chatbotIconButton.addEventListener('click', () => {
+                chatbotContainer.style.display = 'flex';
+                chatbotBody.style.display = 'flex';
+                chatbotIconButton.style.display = 'none';
+            });
+
+            // Hide chatbot when close icon is clicked
+            chatbotCloseIcon.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                chatbotContainer.style.display = 'none';
+                chatbotIconButton.style.display = 'flex';
+            });
+
+            // Prevent chatbot from closing when clicking inside
+            chatbotContainer.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>

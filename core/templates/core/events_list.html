@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Events | Volunteer Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #2e59a9;
+            --accent-color: #1cc88a;
+            --bg-gradient: linear-gradient(135deg, #4e73df 0%, #1cc88a 100%);
+        }
+
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: var(--bg-gradient) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .feature-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .feature-card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            font-weight: 500;
+            border-radius: 30px;
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .progress {
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #edf2f9;
+        }
+
+        .progress-bar {
+            background: var(--bg-gradient);
+        }
+
+        .search-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-pills .btn {
+            border-width: 2px;
+        }
+
+        .stats-box {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .loading-overlay {
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        @media (max-width: 768px) {
+            .filter-pills {
+                justify-content: center;
+            }
+            
+            .search-container {
+                margin: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-hands-helping me-2"></i>
+                Volunteer Connect
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'events_list' %}">Events</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'volunteer_dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'volunteer_login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-container">
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <h2 class="mb-0">Discover Events</h2>
+                    <p class="text-muted">Find opportunities to make a difference</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="eventSearch" placeholder="Search events...">
+                        <button class="btn btn-primary" type="button" id="searchBtn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-pills mt-4">
+                <button class="btn btn-outline-primary active" data-filter="all">
+                    All Events <span class="badge bg-primary ms-2">{{ events.count }}</span>
+                </button>
+                <button class="btn btn-outline-success" data-filter="upcoming">
+                    Upcoming <span class="badge bg-success ms-2">{{ upcoming_events.count }}</span>
+                </button>
+                <button class="btn btn-outline-secondary" data-filter="past">
+                    Past Events <span class="badge bg-secondary ms-2">{{ past_events.count }}</span>
+                </button>
+                <button class="btn btn-outline-info" data-filter="nearby">
+                    <i class="fas fa-map-marker-alt me-2"></i>Nearby Events
+                </button>
+            </div>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="row g-4" id="eventsContainer">
+            {% for event in events %}
+            <div class="col-lg-4 col-md-6" data-category="{{ event.is_past|yesno:'past,upcoming' }}">
+                <div class="feature-card card h-100">
+                    <!-- Event Image -->
+                    <div class="position-relative">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
+                        {% else %}
+                            <div class="bg-light text-center py-5">
+                                <i class="fas fa-calendar-alt text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Status Badge -->
+                        <div class="position-absolute top-0 end-0 m-3">
+                            {% if event.is_past %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% else %}
+                                <span class="badge bg-success">Upcoming</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- Event Type Badge -->
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-3">
+                            {{ event.type }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">{{ event.name }}</h5>
+                        
+                        <!-- Event Details -->
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-calendar-day text-primary me-2"></i>
+                                <span>{{ event.date|date:"F j, Y" }} at {{ event.time }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                <span>{{ event.address }}</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-users text-primary me-2"></i>
+                                <span>
+                                    {{ event.participant_count }} / {{ event.max_participants|default:"∞" }} participants
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        {% if event.max_participants %}
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar" 
+                                 role="progressbar" 
+                                 style="width: {{ event.participation_percentage }}%"
+                                 aria-valuenow="{{ event.participation_percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Button -->
+                        <div class="d-grid">
+                            {% if not event.is_past %}
+                                {% if user in event.participants.all %}
+                                    <button class="btn btn-success" disabled>
+                                        <i class="fas fa-check-circle me-2"></i>Registered
+                                    </button>
+                                {% else %}
+                                    <a href="{% url 'participate_event' event.id %}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle me-2"></i>Register Now
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'event_detail' event.id %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-history me-2"></i>View Summary
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-calendar-times text-muted mb-4" style="font-size: 4rem;"></i>
+                    <h4>No Events Found</h4>
+                    <p class="text-muted">There are currently no events matching your criteria.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 loading-overlay d-none">
+        <div class="d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter functionality
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            const eventsContainer = document.getElementById('eventsContainer');
+            const searchInput = document.getElementById('eventSearch');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.dataset.filter;
+                    
+                    // Update active state
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Handle nearby filter separately
+                    if (filter === 'nearby') {
+                        if (navigator.geolocation) {
+                            document.getElementById('loadingOverlay').classList.remove('d-none');
+                            navigator.geolocation.getCurrentPosition(position => {
+                                // Call backend to filter nearby events
+                                fetch(`/api/nearby-events/?lat=${position.coords.latitude}&lng=${position.coords.longitude}`)
+                                    .then(response => response.json())
+                                    .then data => {
+                                        updateEvents(data.events);
+                                        document.getElementById('loadingOverlay').classList.add('d-none');
+                                    });
+                            });
+                        } else {
+                            alert('Geolocation is not supported by your browser');
+                        }
+                        return;
+                    }
+                    
+                    // Filter events
+                    filterEvents(filter);
+                });
+            });
+            
+            // Search functionality
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = this.value.toLowerCase();
+                    filterEvents(
+                        document.querySelector('[data-filter].active').dataset.filter,
+                        searchTerm
+                    );
+                }, 300);
+            });
+            
+            function filterEvents(filter, searchTerm = '') {
+                const events = document.querySelectorAll('#eventsContainer > div');
+                
+                events.forEach(event => {
+                    const category = event.dataset.category;
+                    const title = event.querySelector('.card-title').textContent.toLowerCase();
+                    const details = event.querySelector('.card-body').textContent.toLowerCase();
+                    
+                    const matchesFilter = filter === 'all' || category === filter;
+                    const matchesSearch = !searchTerm || 
+                        title.includes(searchTerm) || 
+                        details.includes(searchTerm);
+                    
+                    if (matchesFilter && matchesSearch) {
+                        event.style.display = '';
+                    } else {
+                        event.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

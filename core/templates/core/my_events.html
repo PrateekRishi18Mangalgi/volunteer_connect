@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+{% load static %}
+{% load event_filters %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Events</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #3730a3;
+            --secondary-color: #f59e0b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin: 2rem auto;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            border: 1px solid #e2e8f0;
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .event-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+            transition: var(--transition);
+        }
+
+        .event-card:hover .event-image {
+            transform: scale(1.05);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .event-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .event-detail {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .event-detail i {
+            width: 1.2rem;
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .certificate-card {
+            background: linear-gradient(135deg, #fef3c7, #fed7aa);
+            border: 2px solid var(--secondary-color);
+        }
+
+        .certificate-card .event-title {
+            color: #92400e;
+        }
+
+        .btn-group-custom {
+            gap: 0.5rem;
+        }
+
+        .btn-custom {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border: none;
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-custom {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .alert-custom {
+            border-radius: var(--border-radius);
+            border: none;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            color: #1e40af;
+            box-shadow: var(--card-shadow);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .completion-badge {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hours-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 0.25rem;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ddd;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #ffc107;
+        }
+
+        .star-rating i {
+            transition: color 0.2s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .btn-group-custom {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">My Volunteer Journey</h1>
+                <p class="page-subtitle">Track your participation, download certificates, and view your impact</p>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-number" id="participatedCount">0</div>
+                    <div class="stat-label">Events Participated</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedCount">0</div>
+                    <div class="stat-label">Events Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="requestedCount">0</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalHours">0</div>
+                    <div class="stat-label">Volunteer Hours</div>
+                </div>
+            </div>
+
+            <!-- Participated Events Section -->
+            <section class="mb-5">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h2 class="section-title">Participated Events</h2>
+                </div>
+                <div class="row" id="participatedEvents">
+                    {% for event in participated_events %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="event-card">
+                                <img src="{{ event.image.url }}" alt="{{ event.name }}" class="event-image">
+                                <div class="card-body">
+                                    <h5 class="event-title">{{ event.name }}</h5>
+                                    <div class="event-detail">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>{{ event.date }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-clock"></i>
+                                        <span>{{ event.time }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ event.type }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ event.address }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-map-pin"></i>
+                                        <span>{{ event.pincode }}</span>
+                                    </div>
+
+                                    
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <h4>No Events Yet</h4>
+                                <p>You haven't participated in any events. Start volunteering to see your events here!</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Certificates Section -->
+            <section class="mb-5">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h2 class="section-title">My Certificates</h2>
+                </div>
+                <div class="row" id="certificates">
+                    {% for event in participated_events %}
+                        {% if event.is_completed %}
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="event-card certificate-card" data-hours="{{ event.duration_hours }}">
+                                    <div class="card-body">
+                                        <div class="completion-badge">
+                                            <i class="fas fa-check-circle"></i>
+                                            Completed
+                                        </div>
+                                        <h5 class="event-title">{{ event.name }}</h5>
+                                        <div class="hours-display">
+                                            <i class="fas fa-clock"></i> {{ event.duration_hours }} Hours
+                                        </div>
+                                        <div class="event-detail">
+                                            <i class="fas fa-tag"></i>
+                                            <span>{{ event.type }}</span>
+                                        </div>
+                                        <div class="event-detail">
+                                            <i class="fas fa-calendar"></i>
+                                            <span>{{ event.date }}</span>
+                                        </div>
+                                        <div class="event-detail">
+                                            <i class="fas fa-calendar-check"></i>
+                                            <span>{{ event.completion_date }}</span>
+                                        </div>
+                                        <div class="d-flex btn-group-custom mt-3">
+                                            <button class="btn btn-primary-custom btn-custom flex-fill" 
+                                                    onclick="generateCertificate(
+                                                        '{{ event.name }}', 
+                                                        '{{ event.completion_date|date:"F d, Y" }}', 
+                                                        '{{ user.volunteerprofile.first_name }} {{ user.volunteerprofile.last_name }}',
+                                                        '{{ event.type }}',
+                                                        {{ event.duration_hours }}
+                                                    )">
+                                                <i class="fas fa-download"></i>
+                                                Download
+                                            </button>
+                                            <button class="btn btn-outline-custom btn-custom" 
+                                                    onclick="previewCertificate('{{ event.name }}')">
+                                                <i class="fas fa-eye"></i>
+                                                Preview
+                                            </button>
+                                        </div>
+
+                                        <!-- Add Feedback Section -->
+                                        {% if event.is_completed %}
+                                            {% if not event|has_feedback:user %}
+                                                <div class="mt-3">
+                                                    <button class="btn btn-primary-custom btn-custom w-100" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#feedbackModal{{ event.id }}">
+                                                        <i class="fas fa-star me-2"></i> Leave Feedback
+                                                    </button>
+                                                </div>
+                                            {% else %}
+                                                <div class="mt-3 p-3 bg-light rounded">
+                                                    <h6 class="mb-2"><i class="fas fa-comment me-2"></i>Your Feedback</h6>
+                                                    <div class="stars mb-2">
+                                                        {% with feedback=event|get_user_feedback:user %}
+                                                            {% for i in "12345"|make_list %}
+                                                                <i class="fas fa-star {% if forloop.counter <= feedback.rating %}text-warning{% else %}text-muted{% endif %}"></i>
+                                                            {% endfor %}
+                                                            <small class="ms-2 text-muted">{{ feedback.created_at|date:"M d, Y" }}</small>
+                                                        {% endwith %}
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-custom">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>No certificates available yet.</strong> Complete your volunteer events to earn certificates!
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Requested Events Section -->
+            <section class="mb-5">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <h2 class="section-title">Pending Requests</h2>
+                </div>
+                <div class="row" id="requestedEvents">
+                    {% for event in requested_events %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="event-card">
+                                <div style="position: relative;">
+                                    <img src="{{ event.image.url }}" alt="{{ event.name }}" class="event-image">
+                                    <div style="position: absolute; top: 10px; right: 10px; background: var(--warning-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="event-title">{{ event.name }}</h5>
+                                    <div class="event-detail">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>{{ event.date }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-clock"></i>
+                                        <span>{{ event.time }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-tag"></i>
+                                        <span>{{ event.type }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ event.address }}</span>
+                                    </div>
+                                    <div class="event-detail">
+                                        <i class="fas fa-map-pin"></i>
+                                        <span>{{ event.pincode }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <h4>No Pending Requests</h4>
+                                <p>You don't have any pending event requests at the moment.</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="text-center">
+                <a href="{% url 'volunteer_dashboard' %}" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    {% for event in participated_events %}
+        <div class="modal fade" id="feedbackModal{{ event.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Leave Feedback for {{ event.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="{% url 'submit_feedback' event.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="star-rating">
+                                    {% for i in "12345"|make_list %}
+                                        <input type="radio" name="rating" value="{{ forloop.counter }}" id="star{{ forloop.counter }}{{ event.id }}" required>
+                                        <label for="star{{ forloop.counter }}{{ event.id }}">
+                                            <i class="far fa-star"></i>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Comments</label>
+                                <textarea name="comment" class="form-control" rows="4" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        // Import jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Initialize stats on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+        });
+
+        function updateStats() {
+            const participatedCount = document.querySelectorAll('#participatedEvents .event-card').length;
+            const completedCount = document.querySelectorAll('#certificates .certificate-card').length;
+            const requestedCount = document.querySelectorAll('#requestedEvents .event-card').length;
+            
+            // Calculate total hours from all completed events
+            const totalHours = Array.from(document.querySelectorAll('.hours-display')).reduce((sum, el) => {
+                const hours = parseInt(el.textContent.match(/\d+/)[0]);
+                return sum + hours;
+            }, 0);
+
+            // Update stat displays with animation
+            animateNumber('participatedCount', participatedCount);
+            animateNumber('completedCount', completedCount);
+            animateNumber('requestedCount', requestedCount);
+            animateNumber('totalHours', totalHours);
+        }
+
+        function animateNumber(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            let currentValue = 0;
+            const increment = targetValue / 30;
+            const timer = setInterval(() => {
+                currentValue += increment;
+                if (currentValue >= targetValue) {
+                    currentValue = targetValue;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(currentValue);
+            }, 50);
+        }
+
+        function generateCertificate(eventName, completionDate, volunteerName, eventType, hours) {
+            try {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+                button.disabled = true;
+
+                // Create PDF document
+                const doc = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Set background with gradient effect
+                doc.setFillColor(245, 247, 250);
+                doc.rect(0, 0, 297, 210, 'F');
+
+                // Add decorative elements
+                doc.setFillColor(79, 70, 229);
+                doc.circle(50, 50, 20, 'F');
+                doc.setFillColor(99, 102, 241);
+                doc.circle(247, 50, 15, 'F');
+                doc.setFillColor(79, 70, 229);
+                doc.circle(50, 160, 15, 'F');
+                doc.setFillColor(99, 102, 241);
+                doc.circle(247, 160, 20, 'F');
+
+                // Add main border
+                doc.setDrawColor(79, 70, 229);
+                doc.setLineWidth(2);
+                doc.rect(15, 15, 267, 180);
+                
+                // Add inner decorative border
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(156, 163, 175);
+                doc.rect(25, 25, 247, 160);
+
+                // Certificate header
+                doc.setFontSize(32);
+                doc.setTextColor(79, 70, 229);
+                doc.text('CERTIFICATE', 148.5, 50, { align: 'center' });
+                
+                doc.setFontSize(18);
+                doc.setTextColor(107, 114, 128);
+                doc.text('OF PARTICIPATION', 148.5, 60, { align: 'center' });
+
+                // Decorative line
+                doc.setDrawColor(79, 70, 229);
+                doc.setLineWidth(1);
+                doc.line(100, 70, 197, 70);
+
+                // Main content
+                doc.setFontSize(14);
+                doc.setTextColor(55, 65, 81);
+                doc.text('This is to certify that', 148.5, 85, { align: 'center' });
+
+                // Volunteer name with fallback
+                const displayName = volunteerName && volunteerName.trim() 
+                    ? volunteerName 
+                    : 'Volunteer';
+                
+                doc.setFontSize(28);
+                doc.setTextColor(79, 70, 229);
+                doc.text(displayName, 148.5, 105, { align: 'center' });
+
+                // Event details
+                doc.setFontSize(14);
+                doc.setTextColor(55, 65, 81);
+                doc.text('has successfully participated in the volunteer event', 148.5, 120, { align: 'center' });
+                
+                doc.setFontSize(20);
+                doc.setTextColor(79, 70, 229);
+                doc.text(`"${eventName}"`, 148.5, 135, { align: 'center' });
+                
+                doc.setFontSize(14);
+                doc.setTextColor(55, 65, 81);
+                doc.text(`Event Type: ${eventType}`, 148.5, 148, { align: 'center' });
+                doc.text(`Completion Date: ${completionDate}`, 148.5, 158, { align: 'center' });
+                doc.text(`Volunteer Hours: ${hours} Hours`, 148.5, 168, { align: 'center' });
+
+                // Signature section
+                doc.setFontSize(11);
+                doc.setTextColor(107, 114, 128);
+                doc.text('Event Coordinator', 60, 185);
+                doc.text('Date of Issue', 237, 185);
+                
+                // Signature lines
+                doc.setDrawColor(156, 163, 175);
+                doc.setLineWidth(0.5);
+                doc.line(40, 180, 80, 180);
+                doc.line(217, 180, 257, 180);
+
+                // Current date
+                const currentDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                doc.setFontSize(10);
+                doc.text(currentDate, 237, 188);
+
+                // Certificate ID
+                const certificateId = generateCertificateId(eventName, displayName);
+                doc.setFontSize(8);
+                doc.setTextColor(156, 163, 175);
+                doc.text(`Certificate ID: ${certificateId}`, 148.5, 195, { align: 'center' });
+
+                // Save the PDF
+                const fileName = `${eventName.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_certificate.pdf`;
+                doc.save(fileName);
+
+                // Reset button state
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    
+                    // Show success message
+                    showNotification('Certificate downloaded successfully!', 'success');
+                }, 1000);
+
+            } catch (error) {
+                console.error('Error generating certificate:', error);
+                showNotification('Error generating certificate. Please try again.', 'error');
+            }
+        }
+
+        function generateCertificateId(eventName, volunteerName) {
+            const timestamp = Date.now().toString(36);
+            const hash = btoa(`${eventName}-${volunteerName}-${timestamp}`).substring(0, 8);
+            return `CERT-${hash}-${timestamp.substr(-4)}`;
+        }
+
+        function previewCertificate(eventName) {
+            showNotification('Certificate preview feature coming soon!', 'info');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} position-fixed`;
+            notification.style.cssText = `
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                min-width: 300px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-triangle'
+            };
+            
+            notification.innerHTML = `
+                <i class="${icons[type]} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Add CSS animation for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

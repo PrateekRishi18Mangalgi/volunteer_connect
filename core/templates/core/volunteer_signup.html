@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #f8f9fc;
+            --accent-color: #2e59d9;
+        }
+        
+        body {
+            background-color: var(--secondary-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border-radius: 0.5rem;
+            border: none;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+        
+        .input-group-text {
+            background-color: #e9ecef;
+        }
+        
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-image {
+            background: linear-gradient(rgba(78, 115, 223, 0.8), rgba(78, 115, 223, 0.8)), 
+                        url('https://source.unsplash.com/random/800x600/?volunteer');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        
+        .benefits-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .benefits-list i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+        
+        /* Map styles from first HTML */
+        .map-container {
+            height: 300px;
+            width: 100%;
+            margin-top: 10px;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-image {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg">
+                    <div class="hero-image">
+                        <h1><i class="fas fa-hands-helping me-2"></i>Join Our Volunteer Community</h1>
+                        <p class="lead">Make a difference in your community today</p>
+                    </div>
+                    
+                    <div class="card-body p-4 p-md-5">
+                        <div class="row">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <h3 class="mb-4">Why Volunteer With Us?</h3>
+                                <ul class="benefits-list">
+                                    <li><i class="fas fa-check-circle"></i> Make a real impact in your community</li>
+                                    <li><i class="fas fa-check-circle"></i> Gain valuable experience and skills</li>
+                                    <li><i class="fas fa-check-circle"></i> Meet like-minded people</li>
+                                    <li><i class="fas fa-check-circle"></i> Flexible volunteering opportunities</li>
+                                    <li><i class="fas fa-check-circle"></i> Receive training and support</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h3 class="text-center mb-4">Create Your Account</h3>
+                                <form method="post" class="needs-validation" novalidate>
+                                    {% csrf_token %}
+                                    
+                                    <div class="form-section">
+                                        <h5 class="mb-3"><i class="fas fa-user me-2"></i>Personal Information</h5>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="first_name" class="form-label">First Name</label>
+                                                <input type="text" name="first_name" id="first_name" class="form-control" required>
+                                                <div class="invalid-feedback">Please provide your first name.</div>
+                                            </div>
+                                            
+                                            <div class="col-md-6 mb-3">
+                                                <label for="last_name" class="form-label">Last Name</label>
+                                                <input type="text" name="last_name" id="last_name" class="form-control" required>
+                                                <div class="invalid-feedback">Please provide your last name.</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Existing form fields -->
+                                        {{ form.as_p }}
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Additional Details</h5>
+                                        
+                                        <div class="mb-3">
+                                            <label for="age" class="form-label">Age</label>
+                                            <input type="number" name="age" id="age" class="form-control" placeholder="Enter your age" min="16" max="99" required>
+                                            <div class="invalid-feedback">Please provide a valid age (16-99).</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="profession" class="form-label">Profession</label>
+                                            <input type="text" name="profession" id="profession" class="form-control" placeholder="Enter your profession" required>
+                                            <div class="invalid-feedback">Please provide your profession.</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="gender" class="form-label">Gender</label>
+                                            <select name="gender" id="gender" class="form-select" required>
+                                                <option value="" selected disabled>Select your gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Non-binary">Non-binary</option>
+                                                <option value="Prefer not to say">Prefer not to say</option>
+                                            </select>
+                                            <div class="invalid-feedback">Please select your gender.</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="interests" class="form-label">Interests (Select up to 3)</label>
+                                            <select name="interests" id="interests" class="form-select" multiple size="4" required>
+                                                <option value="Education">Education</option>
+                                                <option value="Environment">Environment</option>
+                                                <option value="Healthcare">Healthcare</option>
+                                                <option value="Animals">Animals</option>
+                                                <option value="Elderly Care">Elderly Care</option>
+                                                <option value="Children">Children</option>
+                                                <option value="Disability Support">Disability Support</option>
+                                                <option value="Community Development">Community Development</option>
+                                                <option value="Music">Music</option>
+                                            </select>
+                                            <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+                                            <div class="invalid-feedback">Please select at least one interest.</div>
+                                        </div>
+                                        
+                                        <!-- Added Address field similar to first HTML -->
+                                        <div class="mb-3">
+                                            <label for="id_address" class="form-label">Full Address</label>
+                                            <input type="text" name="address" id="id_address" class="form-control" placeholder="Enter your complete address" required>
+                                            <small class="text-muted">Include street, city, and other details</small>
+                                            <div class="invalid-feedback">Please provide your complete address.</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="pincode" class="form-label">Pincode/Zip Code</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                                <input type="text" name="pincode" id="pincode" class="form-control" placeholder="Enter your area code" pattern="\d{5,6}" required>
+                                            </div>
+                                            <div class="invalid-feedback">Please provide a valid 5 or 6 digit pincode.</div>
+                                        </div>
+                                        
+                                        <!-- Map container with the same styling as first HTML -->
+                                        <div class="mb-3">
+                                            <label for="map" class="form-label">Your Location</label>
+                                            <div id="map" class="map-container"></div>
+                                            <small class="text-muted">Map will update based on your address or pincode</small>
+                                        </div>
+                                        
+                                        <!-- Hidden inputs for lat/lng -->
+                                        <input type="hidden" id="latitude" name="latitude">
+                                        <input type="hidden" id="longitude" name="longitude">
+                                    </div>
+                                    
+                                    <div class="form-check mb-4">
+                                        <input class="form-check-input" type="checkbox" id="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms and Conditions</a>
+                                        </label>
+                                        <div class="invalid-feedback">You must agree before submitting.</div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary w-100 py-2">
+                                        <i class="fas fa-user-plus me-2"></i>Sign Up Now
+                                    </button>
+                                </form>
+                                
+                                <div class="text-center mt-3">
+                                    <p>Already have an account? <a href="/volunteer/login/" class="text-decoration-none fw-bold">Log in here</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Terms and Conditions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Volunteer Agreement</h6>
+                    <p>By signing up as a volunteer, you agree to commit to the values and mission of our organization. You understand that volunteering is unpaid and that you may be required to complete training before beginning your volunteer work.</p>
+                    
+                    <h6 class="mt-3">Privacy Policy</h6>
+                    <p>We respect your privacy and will protect your personal information. Your details will only be used for volunteer coordination and will not be shared with third parties without your consent.</p>
+                    
+                    <h6 class="mt-3">Code of Conduct</h6>
+                    <p>As a volunteer, you agree to treat all staff, fellow volunteers, and community members with respect and dignity. You understand that inappropriate behavior may result in termination of your volunteer position.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">I Understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBDioUYwNz5fMaYgWJCcPkAu6Q-qROcyg&libraries=places"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let map, marker, autocomplete;
+        let pincodeTimeout;
+
+        // Initialize map and all related functionality
+        function initMap() {
+            const defaultLocation = { lat: 20.5937, lng: 78.9629 }; // India center
+            
+            // Create map
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 8,
+                center: defaultLocation,
+            });
+            
+            // Create marker
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true,
+            });
+            
+            // Set initial coordinates
+            document.getElementById("latitude").value = defaultLocation.lat;
+            document.getElementById("longitude").value = defaultLocation.lng;
+            
+            // Setup marker drag event
+            marker.addListener("dragend", function() {
+                const position = marker.getPosition();
+                updateCoordinates(position.lat(), position.lng());
+                reverseGeocode(position);
+            });
+            
+            // Setup address autocomplete
+            const addressInput = document.getElementById("id_address");
+            autocomplete = new google.maps.places.Autocomplete(addressInput);
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    const location = place.geometry.location;
+                    updateMapLocation(location);
+                    updateCoordinates(location.lat(), location.lng());
+                }
+            });
+            
+            // Setup pincode input
+            setupPincodeGeocoding();
+            
+            // Get user's current location
+            getCurrentLocation();
+        }
+
+        function updateMapLocation(location) {
+            map.setCenter(location);
+            map.setZoom(15);
+            marker.setPosition(location);
+        }
+
+        function updateCoordinates(lat, lng) {
+            document.getElementById("latitude").value = lat;
+            document.getElementById("longitude").value = lng;
+        }
+
+        function reverseGeocode(location) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ location: location }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    document.getElementById('id_address').value = results[0].formatted_address;
+                    
+                    const postcode = results[0].address_components.find(
+                        component => component.types.includes('postal_code')
+                    );
+                    if (postcode) {
+                        document.getElementById('pincode').value = postcode.long_name;
+                    }
+                }
+            });
+        }
+
+        function setupPincodeGeocoding() {
+            const pincodeInput = document.getElementById("pincode");
+            pincodeInput.addEventListener("input", function() {
+                clearTimeout(pincodeTimeout);
+                const pincode = this.value;
+                
+                pincodeTimeout = setTimeout(() => {
+                    if (pincode.length === 5 || pincode.length === 6) {
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ address: pincode }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                const location = results[0].geometry.location;
+                                updateMapLocation(location);
+                                updateCoordinates(location.lat(), location.lng());
+                            }
+                        });
+                    }
+                }, 500);
+            });
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const location = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        updateMapLocation(location);
+                        updateCoordinates(location.lat, location.lng);
+                        reverseGeocode(location);
+                    },
+                    (error) => {
+                        console.log("Geolocation error:", error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        }
+
+        // Initialize map when page loads
+        window.onload = initMap;
+        
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+</body>
+</html>

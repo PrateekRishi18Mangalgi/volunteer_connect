@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Event</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            padding: 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: var(--border-radius);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .btn-success {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .map-container {
+            height: 300px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 10px;
+            border: none;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-control, .form-select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card p-4 p-md-5 shadow-sm">
+                    <h2 class="text-center mb-4 fw-bold">Edit Event Details</h2>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Replace the Basic Information section with this -->
+<h5 class="mb-3 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i> Basic Information</h5>
+
+<div class="row">
+    <!-- Event Name -->
+    <div class="col-md-6 mb-4">
+        <label for="id_name" class="form-label">Event Name</label>
+        <input type="text" 
+               name="name" 
+               id="id_name" 
+               class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+               value="{{ form.instance.name }}" 
+               required
+               placeholder="Enter event name">
+        {% if form.name.errors %}
+        <div class="invalid-feedback">
+            {{ form.name.errors.0 }}
+        </div>
+        {% endif %}
+        <small class="text-muted">Give your event a descriptive name</small>
+    </div>
+    
+    <!-- Event Type -->
+    <div class="col-md-6 mb-4">
+        <label for="id_type" class="form-label">Event Type</label>
+        <select name="type" 
+                id="id_type" 
+                class="form-select {% if form.type.errors %}is-invalid{% endif %}" 
+                required>
+            <option value="">Select event type</option>
+            <option value="Education" {% if form.instance.type == 'Education' %}selected{% endif %}>Education</option>
+            <option value="Environment" {% if form.instance.type == 'Environment' %}selected{% endif %}>Environment</option>
+            <option value="Healthcare" {% if form.instance.type == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+            <option value="Animal Welfare" {% if form.instance.type == 'Animal Welfare' %}selected{% endif %}>Animal Welfare</option>
+            <option value="Community Service" {% if form.instance.type == 'Community Service' %}selected{% endif %}>Community Service</option>
+            <option value="Elderly Care" {% if form.instance.type == 'Elderly Care' %}selected{% endif %}>Elderly Care</option>
+        </select>
+        {% if form.type.errors %}
+        <div class="invalid-feedback">
+            {{ form.type.errors.0 }}
+        </div>
+        {% endif %}
+        <small class="text-muted">Select the category that best fits</small>
+    </div>
+</div>
+
+<!-- Address and Pincode -->
+<div class="mb-4">
+    <label for="id_pincode" class="form-label">Pincode</label>
+    <input type="text" 
+           name="pincode" 
+           id="id_pincode" 
+           class="form-control {% if form.pincode.errors %}is-invalid{% endif %}" 
+           value="{{ form.instance.pincode }}" 
+           required
+           placeholder="Enter 6-digit pincode"
+           maxlength="6"
+           pattern="[0-9]{6}">
+    {% if form.pincode.errors %}
+    <div class="invalid-feedback">
+        {{ form.pincode.errors.0 }}
+    </div>
+    {% endif %}
+    <small class="text-muted">Enter your 6-digit postal code</small>
+</div>
+
+<div class="mb-4">
+    <label for="id_address" class="form-label">Event Address</label>
+    <textarea name="address" 
+              id="id_address" 
+              class="form-control {% if form.address.errors %}is-invalid{% endif %}" 
+              rows="3" 
+              required
+              placeholder="Enter full address">{{ form.instance.address }}</textarea>
+    {% if form.address.errors %}
+    <div class="invalid-feedback">
+        {{ form.address.errors.0 }}
+    </div>
+    {% endif %}
+    <small class="text-muted">Include street, city, and other details</small>
+</div>
+                        
+                        <div class="row">
+                            <!-- Date -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_date" class="form-label">Date</label>
+                                {{ form.date }}
+                            </div>
+                            
+                            <!-- Time -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_time" class="form-label">Time</label>
+                                {{ form.time }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Duration -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_duration_hours" class="form-label">Duration (hours)</label>
+                                <div class="input-group">
+                                    {{ form.duration_hours }}
+                                    <span class="input-group-text">
+                                        <i class="fas fa-clock"></i>
+                                    </span>
+                                </div>
+                                <small class="text-muted">Event duration (1-24 hours)</small>
+                            </div>
+                            
+                            <!-- Maximum Participants -->
+                            <div class="col-md-3 mb-3">
+                                <label for="id_max_participants" class="form-label">Maximum Participants</label>
+                                <div class="input-group">
+                                    {{ form.max_participants }}
+                                    <span class="input-group-text">
+                                        <i class="fas fa-users"></i>
+                                    </span>
+                                </div>
+                                <small class="text-muted">Maximum number of participants (1-1000)</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Image Upload -->
+                        <div class="mb-4">
+                            <label for="id_image" class="form-label">Event Image</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="id_image" name="image" accept="image/*">
+                            </div>
+                            <div id="imagePreview" class="mt-2 {% if not form.instance.image %}d-none{% endif %}">
+                                <small class="text-muted">Image preview:</small>
+                                <img id="previewImage" src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}" 
+                                     alt="Preview" class="img-thumbnail current-image-preview d-block">
+                            </div>
+                        </div>
+                        
+                        <!-- Location Controls -->
+                        <div class="mb-2">
+                            <button type="button" class="btn btn-outline-primary" id="getCurrentLocation">
+                                <i class="fas fa-location-arrow me-2"></i>Use Current Location
+                            </button>
+                        </div>
+                        
+                        <!-- Google Map -->
+                        <div class="mb-4">
+                            <label class="form-label">Event Location</label>
+                            <div id="map" class="map-container"></div>
+                            <small class="text-muted">Drag marker to adjust location or use the current location button</small>
+                            <input type="hidden" id="latitude" name="latitude" value="{{ form.instance.latitude|default:'' }}">
+                            <input type="hidden" id="longitude" name="longitude" value="{{ form.instance.longitude|default:'' }}">
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBDioUYwNz5fMaYgWJCcPkAu6Q-qROcyg&libraries=places"></script>
+    <script>
+let map, marker, autocomplete;
+let pincodeTimeout;
+
+function initMap() {
+    // Get initial coordinates from the form instance or use default
+    const initialLat = {{ form.instance.latitude|default:'20.5937' }};
+    const initialLng = {{ form.instance.longitude|default:'78.9629' }};
+    const initialLocation = { lat: parseFloat(initialLat), lng: parseFloat(initialLng) };
+
+    map = new google.maps.Map(document.getElementById("map"), {
+        zoom: initialLat === 20.5937 ? 8 : 15,
+        center: initialLocation,
+        styles: [
+            {
+                "featureType": "administrative",
+                "elementType": "geometry",
+                "stylers": [{"visibility": "off"}]
+            },
+            {
+                "featureType": "poi",
+                "stylers": [{"visibility": "off"}]
+            },
+            {
+                "featureType": "road",
+                "elementType": "labels.icon",
+                "stylers": [{"visibility": "off"}]
+            },
+            {
+                "featureType": "transit",
+                "stylers": [{"visibility": "off"}]
+            }
+        ]
+    });
+
+    marker = new google.maps.Marker({
+        position: initialLocation,
+        map: map,
+        draggable: true,
+        icon: {
+            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+        }
+    });
+
+    // Update lat/lng on marker drag
+    marker.addListener("dragend", function() {
+        const position = marker.getPosition();
+        document.getElementById("latitude").value = position.lat();
+        document.getElementById("longitude").value = position.lng();
+        
+        // Reverse geocode to update address and pincode
+        reverseGeocode(position);
+    });
+
+    // Address autocomplete
+    const addressInput = document.getElementById("id_address");
+    autocomplete = new google.maps.places.Autocomplete(addressInput);
+    autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (place.geometry) {
+            updateMapAndForm(place.geometry.location, place);
+        }
+    });
+
+    // Pincode handler
+    setupPincodeHandler();
+}
+
+function updateMapAndForm(location, placeData) {
+    map.setCenter(location);
+    map.setZoom(15);
+    marker.setPosition(location);
+    
+    document.getElementById("latitude").value = location.lat();
+    document.getElementById("longitude").value = location.lng();
+    
+    if (placeData) {
+        const addressInput = document.getElementById("id_address");
+        addressInput.value = placeData.formatted_address || addressInput.value;
+        
+        const pincodeComponent = placeData.address_components?.find(
+            component => component.types.includes('postal_code')
+        );
+        if (pincodeComponent) {
+            document.getElementById("id_pincode").value = pincodeComponent.long_name;
+        }
+    }
+}
+
+function reverseGeocode(location) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ location: location }, (results, status) => {
+        if (status === "OK" && results[0]) {
+            updateMapAndForm(location, results[0]);
+        }
+    });
+}
+
+function setupPincodeHandler() {
+    const pincodeInput = document.getElementById("id_pincode");
+    pincodeInput.addEventListener("input", function() {
+        clearTimeout(pincodeTimeout);
+        const pincode = this.value;
+
+        if (pincode.length === 6) {
+            pincodeTimeout = setTimeout(() => {
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ address: pincode + ", India" }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        updateMapAndForm(results[0].geometry.location, results[0]);
+                    }
+                });
+            }, 500);
+        }
+    });
+}
+
+// Current location button handler
+document.getElementById("getCurrentLocation").addEventListener("click", function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const currentLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                updateMapAndForm(currentLocation);
+                reverseGeocode(currentLocation);
+            },
+            (error) => {
+                console.error("Geolocation error:", error);
+                alert("Could not get your current location. Please make sure location services are enabled.");
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+});
+
+window.onload = initMap;
+</script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

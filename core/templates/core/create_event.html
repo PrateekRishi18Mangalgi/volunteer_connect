@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            background: white;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            padding: 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: var(--border-radius);
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .form-control::placeholder {
+            color: #6c757d;
+            opacity: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 1.75rem;
+            position: relative;
+        }
+        
+        .map-container {
+            height: 300px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .current-image-preview {
+            max-height: 180px;
+            margin-top: 15px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            object-fit: cover;
+        }
+        
+        .header-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title {
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+        }
+        
+        .input-group-text {
+            background-color: var(--light-color);
+            border: 1px solid #e0e0e0;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+        }
+        
+        /* Date/Time picker styles */
+        .flatpickr-input {
+            background-color: #f8f9fa !important;
+            cursor: pointer;
+        }
+        
+        .date-time-wrapper {
+            position: relative;
+        }
+        
+        .date-time-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            pointer-events: none;
+        }
+        
+        .form-control.date-time {
+            padding-right: 40px;
+        }
+        
+        /* Floating labels effect */
+        .floating-label-group {
+            position: relative;
+            margin-bottom: 1.75rem;
+        }
+        
+        .floating-label {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            transition: var(--transition);
+            pointer-events: none;
+            background: white;
+            padding: 0 5px;
+            border-radius: 4px;
+        }
+        
+        .form-control:focus + .floating-label,
+        .form-control:not(:placeholder-shown) + .floating-label {
+            top: -10px;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            background: white;
+            z-index: 1;
+        }
+        
+        /* Custom file upload button */
+        .custom-file-upload {
+            display: inline-block;
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: var(--light-color);
+            border: 1px dashed #ced4da;
+            border-radius: var(--border-radius);
+            width: 100%;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .custom-file-upload:hover {
+            background-color: #e9ecef;
+            border-color: var(--accent-color);
+        }
+        
+        .file-upload-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                padding: 2rem !important;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <div class="header-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <h2 class="section-title">Create New Event</h2>
+                        <p class="text-muted">Fill in the details below to create your event</p>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if messages %}
+                        <div class="mb-4">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger mb-4">
+                            <h6 class="mb-0">Please correct the following errors:</h6>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        <h5 class="mb-3 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i> Basic Information</h5>
+
+                        <div class="row">
+                            <!-- Event Name -->
+                            <div class="col-md-6 mb-4">
+                                <label for="id_name" class="form-label">Event Name</label>
+                                <input type="text" 
+                                       name="name" 
+                                       id="id_name" 
+                                       class="form-control {% if form.name.errors %}is-invalid{% endif %}" 
+                                       value="{{ form.name.value|default:'' }}" 
+                                       required
+                                       placeholder="Enter event name">
+                                {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.name.errors.0 }}
+                                </div>
+                                {% endif %}
+                                <small class="text-muted">Give your event a descriptive name</small>
+                            </div>
+                            
+                            <!-- Event Type -->
+                            <div class="col-md-6 mb-4">
+                                <label for="id_type" class="form-label">Event Type</label>
+                                <select name="type" 
+                                        id="id_type" 
+                                        class="form-select {% if form.type.errors %}is-invalid{% endif %}" 
+                                        required>
+                                    <option value="">Select event type</option>
+                                    <option value="Education" {% if form.type.value == 'Education' %}selected{% endif %}>Education</option>
+                                    <option value="Environment" {% if form.type.value == 'Environment' %}selected{% endif %}>Environment</option>
+                                    <option value="Healthcare" {% if form.type.value == 'Healthcare' %}selected{% endif %}>Healthcare</option>
+                                    <option value="Animal Welfare" {% if form.type.value == 'Animal Welfare' %}selected{% endif %}>Animal Welfare</option>
+                                    <option value="Community Service" {% if form.type.value == 'Community Service' %}selected{% endif %}>Community Service</option>
+                                    <option value="Elderly Care" {% if form.type.value == 'Elderly Care' %}selected{% endif %}>Elderly Care</option>
+                                </select>
+                                {% if form.type.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.type.errors.0 }}
+                                </div>
+                                {% endif %}
+                                <small class="text-muted">Select the category that best fits</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Pincode -->
+                        <div class="mb-4">
+                            <label for="id_pincode" class="form-label">Pincode</label>
+                            <input type="text" 
+                                   name="pincode" 
+                                   id="id_pincode" 
+                                   class="form-control {% if form.pincode.errors %}is-invalid{% endif %}" 
+                                   value="{{ form.pincode.value|default:'' }}" 
+                                   required
+                                   placeholder="Enter 6-digit pincode"
+                                   maxlength="6"
+                                   pattern="[0-9]{6}">
+                            {% if form.pincode.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.pincode.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Enter your 6-digit postal code</small>
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-4">
+                            <label for="id_address" class="form-label">Event Address</label>
+                            <textarea name="address" 
+                                      id="id_address" 
+                                      class="form-control {% if form.address.errors %}is-invalid{% endif %}" 
+                                      rows="3" 
+                                      required
+                                      placeholder="Enter full address">{{ form.address.value|default:'' }}</textarea>
+                            {% if form.address.errors %}
+                            <div class="invalid-feedback">
+                                {{ form.address.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Include street, city, and other details</small>
+                        </div>
+                        
+                        <h5 class="mb-3 mt-5 fw-bold text-primary"><i class="fas fa-clock me-2"></i> Date & Time</h5>
+                        
+                        <!-- Date and Time inputs -->
+                        <div class="row">
+                            <!-- Date -->
+                            <div class="col-md-3 mb-4">
+                                <label class="form-label">Date</label>
+                                <div class="date-time-wrapper">
+                                    {{ form.date }}
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <small class="text-muted">Select event date</small>
+                            </div>
+                            
+                            <!-- Time -->
+                            <div class="col-md-3 mb-4">
+                                <label class="form-label">Time</label>
+                                <div class="date-time-wrapper">
+                                    {{ form.time }}
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <small class="text-muted">Select event time</small>
+                            </div>
+                        </div>
+
+                        <!-- Duration -->
+                        <div class="col-md-3 mb-4">
+                            <label for="id_duration_hours" class="form-label">Duration (hours)</label>
+                            <div class="input-group">
+                                <input type="number" 
+                                       name="duration_hours" 
+                                       id="id_duration_hours" 
+                                       class="form-control" 
+                                       min="1" 
+                                       max="24" 
+                                       value="{{ form.duration_hours.value|default:'1' }}"
+                                       required>
+                                <span class="input-group-text">
+                                    <i class="fas fa-clock"></i>
+                                </span>
+                            </div>
+                            {% if form.duration_hours.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.duration_hours.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Event duration in hours (1-24)</small>
+                        </div>
+
+                        <!-- Maximum Participants -->
+                        <div class="col-md-3 mb-4">
+                            <label for="id_max_participants" class="form-label">Maximum Participants</label>
+                            <div class="input-group">
+                                <input type="number" 
+                                       name="max_participants" 
+                                       id="id_max_participants" 
+                                       class="form-control" 
+                                       min="1" 
+                                       max="1000" 
+                                       value="{{ form.max_participants.value|default:'1' }}"
+                                       required>
+                                <span class="input-group-text">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                            </div>
+                            {% if form.max_participants.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.max_participants.errors.0 }}
+                            </div>
+                            {% endif %}
+                            <small class="text-muted">Maximum number of participants (1-1000)</small>
+                        </div>
+                        
+                        <h5 class="mb-3 mt-5 fw-bold text-primary"><i class="fas fa-image me-2"></i> Event Image</h5>
+                        
+                        <!-- Image Upload -->
+                        <div class="mb-5">
+                            <label for="id_image" class="custom-file-upload">
+                                <i class="fas fa-cloud-upload-alt fa-2x mb-3 text-primary"></i>
+                                <div class="fw-bold">Upload Event Image</div>
+                                <span class="file-upload-text">Click to browse or drag and drop</span>
+                            </label>
+                            <input type="file" id="id_image" name="image" accept="image/*" style="display: none;">
+                            <div id="imagePreview" class="mt-3 text-center d-none">
+                                <small class="text-muted d-block mb-2">Image preview:</small>
+                                <img id="previewImage" src="#" alt="Preview" class="current-image-preview">
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3 fw-bold text-primary"><i class="fas fa-map-marker-alt me-2"></i> Event Location</h5>
+                        
+                        <!-- Google Map -->
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-outline-primary mb-3" id="getCurrentLocation">
+                                <i class="fas fa-location-arrow me-2"></i>Use Current Location
+                            </button>
+                            <div id="map" class="map-container"></div>
+                            <small class="text-muted d-block mt-2">Map will show the approximate location based on address</small>
+                            <input type="hidden" id="latitude" name="latitude">
+                            <input type="hidden" id="longitude" name="longitude">
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg py-3">
+                                <i class="fas fa-plus-circle me-2"></i> Create Event
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBDioUYwNz5fMaYgWJCcPkAu6Q-qROcyg&libraries=places"></script>
+    
+    <script>
+        let map, marker, autocomplete;
+        let pincodeTimeout;
+
+        function initMap() {
+            const defaultLocation = { lat: 20.5937, lng: 78.9629 }; // India center
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 8,
+                center: defaultLocation,
+                styles: [
+                    {
+                        "featureType": "administrative",
+                        "elementType": "geometry",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "poi",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "labels.icon",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    },
+                    {
+                        "featureType": "transit",
+                        "stylers": [
+                            {
+                                "visibility": "off"
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true,
+                icon: {
+                    url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                }
+            });
+
+            // Get current location when initializing
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        // Update map and marker
+                        map.setCenter(currentLocation);
+                        map.setZoom(15);
+                        marker.setPosition(currentLocation);
+                        
+                        // Update form fields
+                        document.getElementById("latitude").value = currentLocation.lat;
+                        document.getElementById("longitude").value = currentLocation.lng;
+                        
+                        // Reverse geocode to get address
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ location: currentLocation }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                const addressInput = document.getElementById("id_address");
+                                addressInput.value = results[0].formatted_address;
+                                
+                                // Extract and set pincode if available
+                                const pincodeComponent = results[0].address_components.find(
+                                    component => component.types.includes('postal_code')
+                                );
+                                if (pincodeComponent) {
+                                    document.getElementById("id_pincode").value = pincodeComponent.long_name;
+                                }
+                            }
+                        });
+                    },
+                    (error) => {
+                        console.log("Geolocation error:", error);
+                        // Fallback to default location if geolocation fails
+                        document.getElementById("latitude").value = defaultLocation.lat;
+                        document.getElementById("longitude").value = defaultLocation.lng;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            }
+
+            // Update lat/lng on marker drag
+            marker.addListener("dragend", function () {
+                const position = marker.getPosition();
+                document.getElementById("latitude").value = position.lat();
+                document.getElementById("longitude").value = position.lng();
+                
+                 // Reverse geocode to update address and pincode
+                const geocoder = new google.maps.Geocoder();
+                geocoder.geocode({ location: position }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        document.getElementById("id_address").value = results[0].formatted_address;
+                        
+                        // Update pincode
+                        const pincodeComponent = results[0].address_components.find(
+                            component => component.types.includes('postal_code')
+                        );
+                        if (pincodeComponent) {
+                            document.getElementById("id_pincode").value = pincodeComponent.long_name;
+                        }
+                    }
+                });
+            });
+
+            // Autocomplete address input
+            const addressInput = document.getElementById("id_address");
+            autocomplete = new google.maps.places.Autocomplete(addressInput);
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    const location = place.geometry.location;
+                    map.setCenter(location);
+                    map.setZoom(15);
+                    marker.setPosition(location);
+                    document.getElementById("latitude").value = location.lat();
+                    document.getElementById("longitude").value = location.lng();
+                    
+                    // Update pincode based on address
+                    const pincodeComponent = place.address_components.find(
+                        component => component.types.includes('postal_code')
+                    );
+                    if (pincodeComponent) {
+                        document.getElementById("id_pincode").value = pincodeComponent.long_name;
+                    } else {
+                        // If no pincode found in the address, try geocoding to get pincode
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ location: location }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                const pincodeComponent = results[0].address_components.find(
+                                    component => component.types.includes('postal_code')
+                                );
+                                if (pincodeComponent) {
+                                    document.getElementById("id_pincode").value = pincodeComponent.long_name;
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Debounced geocoding for pincode
+            const pincodeInput = document.getElementById("id_pincode");
+            pincodeInput.addEventListener("input", function () {
+                clearTimeout(pincodeTimeout);
+                const pincode = this.value;
+
+                pincodeTimeout = setTimeout(() => {
+                    if (pincode.length === 6) {
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ address: pincode }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                const location = results[0].geometry.location;
+                                map.setCenter(location);
+                                marker.setPosition(location);
+                                document.getElementById("latitude").value = location.lat();
+                                document.getElementById("longitude").value = location.lng();
+                                
+                                // Update address field
+                                document.getElementById("id_address").value = results[0].formatted_address;
+                            } else {
+                                alert("Could not find location for the entered pincode.");
+                            }
+                        });
+                    }
+                }, 500);
+            });
+        }
+
+        window.onload = initMap;
+
+        // Image preview
+        document.getElementById("id_image").addEventListener("change", function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById("previewImage");
+                    preview.src = e.target.result;
+                    document.getElementById("imagePreview").classList.remove("d-none");
+                    
+                    // Update upload label
+                    document.querySelector('.custom-file-upload').innerHTML = `
+                        <i class="fas fa-check-circle fa-2x mb-3 text-success"></i>
+                        <div class="fw-bold">${file.name}</div>
+                        <span class="file-upload-text">${(file.size / 1024).toFixed(1)} KB</span>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Custom file upload click
+        document.querySelector('.custom-file-upload').addEventListener('click', function() {
+            document.getElementById('id_image').click();
+        });
+
+        // Current location button
+        document.getElementById("getCurrentLocation").addEventListener("click", function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const currentLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(currentLocation);
+                        map.setZoom(15);
+                        marker.setPosition(currentLocation);
+                        
+                        document.getElementById("latitude").value = currentLocation.lat;
+                        document.getElementById("longitude").value = currentLocation.lng;
+                        
+                        const geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({ location: currentLocation }, (results, status) => {
+                            if (status === "OK" && results[0]) {
+                                document.getElementById("id_address").value = results[0].formatted_address;
+                                
+                                const pincodeComponent = results[0].address_components.find(
+                                    component => component.types.includes('postal_code')
+                                );
+                                if (pincodeComponent) {
+                                    document.getElementById("id_pincode").value = pincodeComponent.long_name;
+                                }
+                            }
+                        });
+                    },
+                    (error) => {
+                        console.log("Geolocation error:", error);
+                        alert("Could not get your current location. Please make sure location services are enabled.");
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        });
+
+        document.getElementById('id_duration_hours').addEventListener('change', function() {
+            const value = parseInt(this.value);
+            if (value < 1) {
+                this.value = 1;
+                alert('Minimum duration is 1 hour');
+            } else if (value > 24) {
+                this.value = 24;
+                alert('Maximum duration is 24 hours');
+            }
+        });
+
+        document.getElementById('id_max_participants').addEventListener('change', function() {
+            const value = parseInt(this.value);
+            if (value < 1) {
+                this.value = 1;
+                alert('Minimum participants is 1');
+            } else if (value > 1000) {
+                this.value = 1000;
+                alert('Maximum participants is 1000');
+            }
+        });
+    </script>
+
+    <!-- Add before closing body tag -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // Initialize date picker
+        flatpickr("#id_date", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disableMobile: "true",
+            onChange: function(selectedDates, dateStr, instance) {
+                // Enable time picker only after date is selected
+                if (selectedDates.length > 0) {
+                    timePicker.set('minDate', selectedDates[0]);
+                }
+            }
+        });
+
+        // Initialize time picker
+        const timePicker = flatpickr("#id_time", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            minuteIncrement: 15,
+            defaultHour: 9,
+            disableMobile: "true",
+            onChange: function(selectedDates, dateStr, instance) {
+                validateDateTime();
+            }
+        });
+
+        // Validate date and time
+        function validateDateTime() {
+            const selectedDate = document.getElementById("id_date").value;
+            const selectedTime = document.getElementById("id_time").value;
+            
+            if (selectedDate && selectedTime) {
+                const dateTime = new Date(selectedDate + " " + selectedTime);
+                const now = new Date();
+                
+                if (dateTime < now) {
+                    alert("Please select a future date and time.");
+                    document.getElementById("id_time").value = "";
+                }
+            }
+        }
+
+        // Add custom classes to the inputs
+        document.getElementById("id_date").classList.add("form-control", "date-time");
+        document.getElementById("id_time").classList.add("form-control", "date-time");
+        
+        // Initialize floating labels for all inputs
+        document.querySelectorAll('.form-control').forEach(input => {
+            if (input.id !== 'id_date' && input.id !== 'id_time') {
+                input.setAttribute('placeholder', ' ');
+            }
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

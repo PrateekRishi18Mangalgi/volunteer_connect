@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Dashboard | Volunteer Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #2e59a9;
+            --accent-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --warning-color: #f6c23e;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+        }
+        
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .sidebar-menu {
+            padding: 0;
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            padding: 10px 20px;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .sidebar-menu li.active {
+            background-color: rgba(78, 115, 223, 0.1);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu li a {
+            color: #333;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .sidebar-menu li i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-img-top {
+            height: 180px;
+            object-fit: cover;
+            transition: all 0.5s;
+        }
+        
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        
+        .badge-custom {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            color: #333;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+        
+        .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            padding-left: 40px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .filter-buttons .btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+            border-radius: 20px;
+            padding: 5px 15px;
+        }
+        
+        .event-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .toggle-sidebar {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .toggle-sidebar {
+                display: block;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+        
+        .category-header {
+            background-color: #f8f9fc;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .distance-badge {
+            position: absolute;
+            top: 40px;
+            right: 10px;
+            z-index: 1;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+        }
+        
+        .alert-location {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .interest-tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 20px;
+            padding: 3px 10px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .matches-interest {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark-mode .navbar,
+        .dark-mode .sidebar,
+        .dark-mode .card,
+        .dark-mode .category-header {
+            background-color: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .dark-mode .sidebar {
+            background: rgba(45, 45, 45, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .sidebar-header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+
+        .dark-mode .sidebar-menu li {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .sidebar-menu li:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark-mode .sidebar-menu li.active {
+            background-color: rgba(78, 115, 223, 0.2);
+            border-left-color: var(--primary-color);
+        }
+
+        .dark-mode .sidebar-menu li a {
+            color: #ffffff;
+        }
+
+        .dark-mode .sidebar-menu li a:hover {
+            color: var(--primary-color);
+        }
+
+        .dark-mode .sidebar-menu li i {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .dark-mode .sidebar-menu .badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        /* Hover effects for sidebar items in dark mode */
+        .dark-mode .sidebar-menu li:hover i {
+            color: var(--primary-color);
+        }
+
+        .dark-mode .sidebar-menu li.active i {
+            color: var(--primary-color);
+        }
+
+        /* Update the settings menu item specifically */
+        .dark-mode .sidebar-menu li a[href="#"] {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .dark-mode .sidebar-menu li a[href="#"]:hover {
+            color: var(--primary-color);
+        }
+
+        /* Add a subtle highlight effect on hover */
+        .dark-mode .sidebar-menu li:hover {
+            backdrop-filter: brightness(1.2);
+        }
+
+        .dark-mode .text-muted {
+            color: #a0a0a0 !important;
+        }
+
+        .dark-mode .event-meta,
+        .dark-mode .event-stats {
+            background-color: #363636;
+        }
+
+        .dark-mode .search-bar input {
+            background-color: #2d2d2d;
+            border-color: #404040;
+            color: #ffffff;
+        }
+
+        .dark-mode .interest-tag {
+            background-color: #363636;
+            color: #ffffff;
+        }
+
+        /* Dark mode styles for navbar and Available Events header */
+        .dark-mode .navbar {
+            background-color: rgba(45, 45, 45, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .navbar h5 {
+            color: #ffffff;
+        }
+
+        .dark-mode .navbar .user-profile span {
+            color: #ffffff;
+        }
+
+        .dark-mode .navbar .toggle-sidebar {
+            color: #ffffff;
+        }
+
+        .dark-mode .navbar .theme-toggle {
+            color: #ffffff;
+        }
+
+        /* Glass effect for dark mode navbar */
+        .dark-mode .navbar.bg-white {
+            background: rgba(45, 45, 45, 0.95) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced text contrast in dark mode */
+        .dark-mode .navbar h5.mb-0 {
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* User profile adjustments for dark mode */
+        .dark-mode .user-profile {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 15px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .user-profile img {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .user-profile span {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Theme toggle button in dark mode */
+        .dark-mode .theme-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .dark-mode .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+        }
+
+        #directionsPanel {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        #directionsPanel .adp-directions {
+            width: 100%;
+        }
+
+        #directionsPanel .adp-directions td {
+            padding: 8px;
+        }
+
+        .get-directions:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Dark mode support */
+        .dark-mode #directionsPanel {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        .dark-mode #directionsModal .modal-content {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .participants-info {
+    font-size: 0.9rem;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.capacity-container {
+    padding: 1rem;
+    background: rgba(0,0,0,0.02);
+    border-radius: 8px;
+}
+
+.progress {
+    background-color: rgba(0,0,0,0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+}
+    </style>
+    <!-- Add this in the <head> section after other CSS links -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBBDioUYwNz5fMaYgWJCcPkAu6Q-qROcyg"></script>
+</head>
+<body>
+    {% load custom_filters %}
+    {% csrf_token %}
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="mb-0"><i class="fas fa-hands-helping me-2"></i> Volunteer Connect</h4>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active">
+                <a href="{% url 'volunteer_dashboard' %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'my_events' %}">
+                    <i class="fas fa-calendar-check"></i> My Events
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'my_events' %}#certificates">
+                    <i class="fas fa-certificate"></i> Certificates
+                    {% if user.participated_events.exists %}
+                        <span class="badge bg-primary rounded-pill float-end">
+                            {{ user.participated_events.count }}
+                        </span>
+                    {% endif %}
+                </a>
+            </li>
+            
+          
+            <li>
+                <a href="/logout/">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center gap-3">
+            <div class="toggle-sidebar" id="toggleSidebar">
+                <button class="btn btn-icon">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div>
+                <h5 class="mb-0 fw-bold">Available Events</h5>
+                <small class="text-muted">Discover and participate in volunteer opportunities</small>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="user-profile d-flex align-items-center">
+                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4e73df&color=fff" 
+                     alt="User" 
+                     class="rounded-circle shadow-sm">
+                <span class="ms-2 d-none d-md-inline">{{ user.username }}</span>
+            </div>
+            <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                <i class="fas fa-sun"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+       <!-- filepath: c:\Users\ASUS\Downloads\complete_volunteer_event_platform - Copy\core\templates\core\volunteer_dashboard.html -->
+
+<!-- Location Alert -->
+<div class="alert {% if user.volunteerprofile.latitude and user.volunteerprofile.longitude %}alert-success{% else %}alert-info{% endif %} alert-location mb-4" id="locationAlert">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <span id="locationStatus">
+                {% if user.volunteerprofile.latitude and user.volunteerprofile.longitude %}
+                    Location services enabled - showing distances from your location
+                {% else %}
+                    Please enable location services to see event distances
+                {% endif %}
+            </span>
+        </div>
+        <button class="btn {% if user.volunteerprofile.latitude and user.volunteerprofile.longitude %}btn-outline-success{% else %}btn-outline-primary{% endif %} btn-sm" id="enableLocation">
+            {% if user.volunteerprofile.latitude and user.volunteerprofile.longitude %}
+                Update Location
+            {% else %}
+                Enable Location
+            {% endif %}
+        </button>
+    </div>
+</div>
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Search and Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control" id="searchEvents" placeholder="Search events...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="filter-buttons">
+                            <span class="me-2">Filter:</span>
+                            <button class="btn btn-sm btn-outline-primary filter-btn active" data-filter="all">All</button>
+                            <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="tomorrow">Tomorrow</button>
+                            <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="interests">My Interests</button>
+                            <button class="btn btn-sm btn-outline-primary filter-btn" data-filter="nearby">Near Me</button>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if user_interests %}
+                <div class="mt-3">
+                    <small class="text-muted me-2">Your interests:</small>
+                    {% for interest in user_interests %}
+                        <span class="interest-tag">{{ interest }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Events by Category -->
+        {% if categorized_events %}
+            {% for category in categorized_events %}
+                <div class="category-section mb-4" id="category-{{ forloop.counter }}">
+                    <div class="category-header">
+                        <h5 class="mb-0">
+                            <span class="badge {{ category.badge_class }} me-2">{{ category.events|length }}</span>
+                            {{ category.category }}
+                        </h5>
+                        <button class="btn btn-sm btn-link toggle-category" data-target="category-events-{{ forloop.counter }}">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="row category-events" id="category-events-{{ forloop.counter }}">
+                        {% for event in category.events %}
+                            <div class="col-lg-4 col-md-6 mb-4 animate__animated animate__fadeIn event-card" 
+                                 data-name="{{ event.name|lower }}" 
+                                 data-type="{{ event.type|lower }}" 
+                                 data-distance="{{ event.distance|default:'unknown' }}"
+                                 data-tomorrow="{% if event.date == tomorrow %}yes{% else %}no{% endif %}"
+                                 data-interests="{% if event.type|lower in user_interests %}yes{% else %}no{% endif %}">
+                                <div class="card h-100 {% if event.type|lower in user_interests %}matches-interest{% endif %}">
+                                    <div class="position-relative">
+                                        {% if event.image %}
+                                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.name }}">
+                                        {% else %}
+                                            <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height: 200px;">
+                                                <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <span class="badge bg-primary event-type-badge">{{ event.type }}</span>
+                                        {% if event.distance is not None %}
+                                            <span class="badge distance-badge">
+                                                <i class="fas fa-map-marker-alt me-1"></i> 
+                                                {{ event.distance|floatformat:1 }} km
+                                               
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ event.name }}</h5>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-user-tie me-2 text-muted"></i>
+                                            <span class="text-muted">{{ event.manager.username }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-calendar-day me-2 text-muted"></i>
+                                            <span class="text-muted">{{ event.date }} at {{ event.time }}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="fas fa-clock me-2 text-muted"></i>
+                                            <span class="text-muted">Duration: {{ event.duration_hours }} {% if event.duration_hours == 1 %}hour{% else %}hours{% endif %}</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+                                            <span class="text-muted">{{ event.address }}, {{ event.pincode }}</span>
+                                        </div>
+                                        
+                                        <!-- Update the participants/slots section with better spacing -->
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div class="participants-info p-2 bg-light rounded">
+                                                <span class="badge bg-light text-dark">
+                                                    <i class="fas fa-users me-1"></i> 
+                                                    <span class="fw-bold">{{ event.participants.count }}/{{ event.max_participants }}</span>
+                                                    <span class="ms-1">spots</span>
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="ms-3">
+                                                {% if event.participants.count >= event.max_participants %}
+                                                    {% if user in event.participants.all %}
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check-circle me-1"></i> You're Registered
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-times-circle me-1"></i> Slots Full
+                                                        </span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if user in event.participants.all %}
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check-circle me-1"></i> You're Registered
+                                                        </span>
+                                                    {% elif user in event.participation_requests.all %}
+                                                        <span class="badge bg-warning text-dark">
+                                                            <i class="fas fa-hourglass-half me-1"></i> Request Pending
+                                                        </span>
+                                                    {% elif user in event.rejected_requests.all %}
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-times-circle me-1"></i> Request Rejected
+                                                        </span>
+                                                    {% else %}
+                                                        <a href="{% url 'participate_event' event.id %}" 
+                                                           class="btn btn-primary btn-sm">
+                                                            <i class="fas fa-plus-circle me-1"></i> Register
+                                                        </a>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="capacity-container mb-3">
+                                            <div class="progress mb-2" style="height: 8px;">
+                                                <div class="progress-bar {% if event.participants.count >= event.max_participants %}bg-danger{% else %}bg-success{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ event.participants.count|percentage:event.max_participants }}%" 
+                                                     aria-valuenow="{{ event.participants.count }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="{{ event.max_participants }}">
+                                                </div>
+                                            </div>
+                                            <small class="text-muted d-block text-center">
+                                                {{ event.max_participants|subtract:event.participants.count }} slots remaining
+                                            </small>
+                                        </div>
+                                        <!-- Add the distance to the Get Directions button data attributes -->
+<button class="btn btn-outline-primary btn-sm get-directions"
+        onclick="getDirections(this)"
+        data-lat="{{ event.latitude }}"
+        data-lng="{{ event.longitude }}"
+        data-name="{{ event.name }}"
+        data-address="{{ event.address }}"
+        data-distance="{{ event.distance|floatformat:1 }}">
+    <i class="fas fa-directions me-1"></i> Get Directions
+</button>
+                                    </div>
+                                </div>
+
+                                <!-- Add this to the event card -->
+                                
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty State -->
+            <div class="card empty-state">
+                <div class="card-body">
+                    <i class="fas fa-calendar-times"></i>
+                    <h4 class="mt-3">No Events Available</h4>
+                    <p class="text-muted">There are currently no events matching your criteria. Check back later!</p>
+                    <button class="btn btn-primary mt-3">
+                        <i class="fas fa-sync-alt me-2"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Directions Modal -->
+    <div class="modal fade" id="directionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Directions to <span id="eventName"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-map-marker-alt text-danger me-2"></i>
+                            <div>
+                                <small class="text-muted">Destination</small>
+                                <div id="destinationAddress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-road text-primary me-2"></i>
+                            <div>
+                                <small class="text-muted">Distance</small>
+                                <div id="tripDistance"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="directionsMap" style="height: 400px; border-radius: 10px;"></div>
+                <div id="directionsPanel" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="googleMapsLink" target="_blank" class="btn btn-primary">
+                    <i class="fab fa-google me-1"></i> Open in Google Maps
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Toggle sidebar on mobile
+            $('#toggleSidebar').click(function() {
+                $('#sidebar').toggleClass('show');
+            });
+
+            // Location handling
+            function handleLocationUpdate() {
+                $('#enableLocation').click(function(e) {
+                    e.preventDefault();
+                    
+                    if (navigator.geolocation) {
+                        $('#locationStatus').html('<i class="fas fa-spinner fa-spin me-2"></i>Updating your location...');
+                        
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                const latitude = position.coords.latitude;
+                                const longitude = position.coords.longitude;
+                                
+                                // Save location via AJAX
+                                $.ajax({
+                                    url: "{% url 'save_user_location' %}",
+                                    type: "POST",
+                                    headers: {
+                                        'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
+                                    },
+                                    data: {
+                                        latitude: latitude,
+                                        longitude: longitude
+                                    },
+                                    success: function(response) {
+                                        $('#locationAlert').removeClass('alert-info alert-warning').addClass('alert-success');
+                                        $('#locationStatus').html('Location updated successfully');
+                                        $('#enableLocation')
+                                            .html('<i class="fas fa-sync me-1"></i> Update')
+                                            .removeClass('btn-outline-primary')
+                                            .addClass('btn-outline-success');
+                                        $('#resetLocation').show();
+                                        
+                                        // Refresh the page after a brief delay
+                                        setTimeout(() => window.location.reload(), 1000);
+                                    },
+                                    error: function(xhr) {
+                                        $('#locationAlert').removeClass('alert-info alert-success').addClass('alert-warning');
+                                        $('#locationStatus').text('Error updating location: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                                    }
+                                });
+                            },
+                            function(error) {
+                                let errorMessage;
+                                switch(error.code) {
+                                    case error.PERMISSION_DENIED:
+                                        errorMessage = 'Location permission denied';
+                                        break;
+                                    case error.POSITION_UNAVAILABLE:
+                                        errorMessage = 'Location information unavailable';
+                                        break;
+                                    case error.TIMEOUT:
+                                        errorMessage = 'Location request timed out';
+                                        break;
+                                    default:
+                                        errorMessage = 'Unknown error occurred';
+                                }
+                                $('#locationAlert').removeClass('alert-info alert-success').addClass('alert-warning');
+                                $('#locationStatus').text(errorMessage);
+                            }
+                        );
+                    } else {
+                        $('#locationAlert').removeClass('alert-info alert-success').addClass('alert-warning');
+                        $('#locationStatus').text('Geolocation is not supported by your browser');
+                    }
+                });
+
+                // Handle location reset
+                $('#resetLocation').click(function(e) {
+                    e.preventDefault();
+                    if (confirm('Reset to your default location?')) {
+                        window.location.reload();
+                    }
+                });
+            }
+
+            handleLocationUpdate();
+
+            // Remove the form since we're using AJAX
+            $('#locationForm').remove();
+
+            // Update the filter button click handlers
+            $('.filter-btn').click(function() {
+                const criterion = $(this).data('filter');
+                
+                if (criterion === 'nearby' && !userHasLocation()) {
+                    $('#enableLocation').click();
+                    return;
+                }
+                
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                filterEvents(criterion);
+            });
+
+            // Add debouncing to search input
+            let searchTimeout;
+            $('#searchEvents').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const currentFilter = $('.filter-btn.active').data('filter') || 'all';
+                    filterEvents(currentFilter);
+                }, 300);
+            });
+
+            // Toggle category sections
+            $('.toggle-category').click(function() {
+                const targetId = $(this).data('target');
+                $('#' + targetId).slideToggle();
+                $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
+            });
+
+            // Main filtering function
+            function filterEvents(criterion) {
+                const searchTerm = $('#searchEvents').val().toLowerCase();
+                let visibleEventsCount = 0;
+
+                $('.event-card').each(function() {
+                    const $card = $(this);
+                    let showCard = true;
+
+                    // Get event data
+                    const eventName = $card.data('name')?.toLowerCase() || '';
+                    const eventType = $card.data('type')?.toLowerCase() || '';
+                    const isTomorrow = $card.data('tomorrow') === 'yes';
+                    const matchesInterests = $card.data('interests') === 'yes';
+                    const distance = parseFloat($card.data('distance'));
+
+                    // Apply filter criteria
+                    switch(criterion) {
+                        case 'tomorrow':
+                            showCard = isTomorrow;
+                            break;
+                            
+                        case 'interests':
+                            showCard = matchesInterests;
+                            break;
+                            
+                        case 'nearby':
+                            if (!userHasLocation()) {
+                                $('#locationAlert').removeClass('alert-success alert-info').addClass('alert-warning');
+                                $('#locationStatus').text('Please enable location services to use this filter');
+                                showCard = false;
+                            } else {
+                                // Show events within 10km
+                                showCard = !isNaN(distance) && distance <= 10;
+                            }
+                            break;
+                            
+                        case 'all':
+                            showCard = true;
+                            break;
+                    }
+
+                    // Apply search filter if there's a search term
+                    if (searchTerm && showCard) {
+                        const searchMatch = eventName.includes(searchTerm) || 
+                                          eventType.includes(searchTerm) ||
+                                          $card.find('.card-body').text().toLowerCase().includes(searchTerm);
+                        showCard = showCard && searchMatch;
+                    }
+
+                    // Show/hide card with animation
+                    if (showCard) {
+                        $card.show().addClass('animate__fadeIn');
+                        visibleEventsCount++;
+                    } else {
+                        $card.hide().removeClass('animate__fadeIn');
+                    }
+                });
+
+                // Update category headers and visibility
+                $('.category-section').each(function() {
+                    const $section = $(this);
+                    const visibleEvents = $section.find('.event-card:visible').length;
+                    const $badge = $section.find('.badge').first();
+                    
+                    // Update count in badge
+                    $badge.text(visibleEvents);
+                    
+                    // Show/hide section based on visible events
+                    if (visibleEvents > 0) {
+                        $section.show();
+                    } else {
+                        $section.hide();
+                    }
+                });
+
+                // Show empty state if no events visible
+                if (visibleEventsCount === 0) {
+                    showEmptyState(criterion, searchTerm);
+                } else {
+                    $('.empty-state').remove();
+                }
+            }
+
+            // Add this new function to handle empty states
+            function showEmptyState(criterion, searchTerm) {
+                $('.empty-state').remove();
+                
+                let message = '';
+                let icon = 'fa-search';
+                
+                switch(criterion) {
+                    case 'tomorrow':
+                        message = 'No events scheduled for tomorrow';
+                        icon = 'fa-calendar-day';
+                        break;
+                    case 'interests':
+                        message = 'No events match your interests';
+                        icon = 'fa-heart';
+                        break;
+                    case 'nearby':
+                        message = 'No events found within 10km';
+                        icon = 'fa-map-marker-alt';
+                        break;
+                    default:
+                        message = searchTerm ? 
+                            `No events found matching "${searchTerm}"` : 
+                            'No events available';
+                        break;
+                }
+
+                const emptyState = `
+                    <div class="card empty-state animate__animated animate__fadeIn">
+                        <div class="card-body text-center">
+                            <i class="fas ${icon} mb-3 d-block" style="font-size: 4rem; color: #ddd;"></i>
+                            <h4>No Events Found</h4>
+                            <p class="text-muted">${message}</p>
+                            <button class="btn btn-primary" onclick="resetFilters()">
+                                <i class="fas fa-undo me-2"></i>Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                $('.main-content').append(emptyState);
+            }
+
+            // Improve the reset filters function
+            function resetFilters() {
+                $('#searchEvents').val('');
+                $('.filter-btn').removeClass('active');
+                $('.filter-btn[data-filter="all"]').addClass('active');
+                filterEvents('all');
+                
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            // Helper function to check if user has location
+            function userHasLocation() {
+                return Boolean($('#locationStatus').text().includes('enabled'));
+            }
+
+            // Initialize page - make sure All filter is selected by default
+            $('.filter-btn[data-filter="all"]').addClass('active');
+            filterEvents('all');
+
+            // Check for existing location data on page load
+            if ($('#latitude').val() && $('#longitude').val()) {
+                $('#locationStatus').text('Location services enabled');
+                $('#locationAlert').removeClass('alert-info').addClass('alert-success');
+                $('#enableLocation').text('Update Location').removeClass('btn-outline-primary').addClass('btn-outline-success');
+            }
+
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Add smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+
+        function saveUserLocation(latitude, longitude) {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch("{% url 'save_user_location' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `latitude=${latitude}&longitude=${longitude}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Location saved successfully');
+                }
+            })
+            .catch(error => console.error('Error saving location:', error));
+        }
+
+        // Theme toggling functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const icon = themeToggle.querySelector('i');
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        }
+
+        // Theme toggle handler
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Update icon
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        function getDirections(element) {
+            const lat = element.dataset.lat;
+            const lng = element.dataset.lng;
+            const eventName = element.dataset.name;
+            const address = element.dataset.address;
+            const existingDistance = element.dataset.distance; // Add this data attribute to your button
+            
+            // Update modal content immediately with existing distance
+            document.getElementById('eventName').textContent = eventName;
+            document.getElementById('destinationAddress').textContent = address;
+            if (existingDistance) {
+                document.getElementById('tripDistance').innerHTML = `
+                    <strong>${existingDistance} km</strong> (by car)
+                `;
+            }
+            
+            // Initialize the map and directions service
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            
+            const map = new google.maps.Map(document.getElementById('directionsMap'), {
+                zoom: 12,
+                center: { lat: parseFloat(lat), lng: parseFloat(lng) }
+            });
+            
+            directionsRenderer.setMap(map);
+            directionsRenderer.setPanel(document.getElementById('directionsPanel'));
+            
+            // Get user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const origin = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        const destination = { lat: parseFloat(lat), lng: parseFloat(lng) };
+                        
+                        // Create Google Maps URL
+                        const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${lat},${lng}&travelmode=driving`;
+                        document.getElementById('googleMapsLink').href = googleMapsUrl;
+                        
+                        // Get directions
+                        directionsService.route(
+                            {
+                                origin: origin,
+                                destination: destination,
+                                travelMode: google.maps.TravelMode.DRIVING,
+                                unitSystem: google.maps.UnitSystem.METRIC // Use kilometers
+                            },
+                            (response, status) => {
+                                if (status === 'OK') {
+                                    directionsRenderer.setDirections(response);
+                                    
+                                    // Update distance info with exact values from Google
+                                    const route = response.routes[0];
+                                    const distance = route.legs[0].distance.text;
+                                    const duration = route.legs[0].duration.text;
+                                    document.getElementById('tripDistance').innerHTML = `
+                                        <strong>${distance}</strong> (<i class="fas fa-clock me-1"></i>${duration} by car)
+                                    `;
+                                } else {
+                                    alert('Could not calculate directions: ' + status);
+                                }
+                            }
+                        );
+                    },
+                    (error) => {
+                        alert('Error getting your location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser');
+            }
+            
+            // Show the modal
+            const directionsModal = new bootstrap.Modal(document.getElementById('directionsModal'));
+            directionsModal.show();
+        }
+    </script>
+</body>
+</html>
